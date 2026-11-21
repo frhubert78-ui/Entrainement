@@ -156,24 +156,113 @@ const POSES={
  uppercut:[53,17,51,28,48,55,58,40,60,27,62,44,68,27,42,73,35,91,56,73,61,91],
  esquive:[58,27,54,37,46,59,62,46,64,34,60,48,67,36,40,75,33,91,58,75,62,91],
  patte:[53,15,51,26,48,53,58,38,60,25,66,26,80,25,42,72,35,91,56,72,61,91]};
-const PROPS={patte:"pad",squat_haut:"ball:61,13",halo:"ball:50,4",bucheron:"ball:68,5",assis_v:"ball:68,66",
- squat:"kb:69,49",charniere:"kb2:65,64",mur_pec:"wall:28",mollet_mur:"wall:91",marche:"tread",marche_pente:"tread2",
- allonge:"mat",genoux_poitrine:"mat",jambe_haut:"mat",figure4:"mat",torsion:"mat",enfant:"mat",planche:"mat",planche_cote:"mat",quatre:"mat",quatre_rot:"mat",assis_9090:"mat",papillon:"mat",assis_v:"mat"};
-function poseSVG(k){
- const p=POSES[k]||POSES.debout,pt=i=>p[i*2]+","+p[i*2+1],L=(a,b,c)=>`<polyline points="${pt(a)} ${pt(b)}${c!=null?" "+pt(c):""}" />`;
- let x="",pr=PROPS[k]||"";
- if(pr.startsWith("ball"))  {const [a,b]=pr.slice(5).split(",");x+=`<circle cx="${a}" cy="${b}" r="5" fill="currentColor" stroke="none" opacity=".75"/>`}
- if(pr.startsWith("kb:"))   {const [a,b]=pr.slice(3).split(",");x+=`<rect x="${a-4}" y="${b-4}" width="8" height="9" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`}
- if(pr.startsWith("kb2"))   {const [a,b]=pr.slice(4).split(",");x+=`<rect x="${a-4}" y="${b}" width="8" height="8" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`}
- if(pr.startsWith("wall"))  {const a=pr.slice(5);x+=`<line x1="${a}" y1="4" x2="${a}" y2="94" stroke-width="3" opacity=".35"/>`}
- if(pr==="pad")             x+=`<rect x="84" y="15" width="9" height="20" rx="3" fill="currentColor" stroke="none" opacity=".55"/><line x1="93" y1="25" x2="99" y2="32" stroke-width="3" opacity=".35"/>`;
- if(pr==="mat")             x+=`<line x1="4" y1="93" x2="96" y2="93" stroke-width="4" opacity=".25"/>`;
- if(pr==="tread")           x+=`<polyline points="10,93 90,93" stroke-width="5" opacity=".3"/><polyline points="82,93 78,40 70,40" stroke-width="2.5" opacity=".35" fill="none"/>`;
- if(pr==="tread2")          x+=`<polyline points="10,93 90,80" stroke-width="5" opacity=".3"/><polyline points="82,82 78,36 70,36" stroke-width="2.5" opacity=".35" fill="none"/>`;
+/* ---- poses dérivées pour les animations ---- */
+const P=(b,o)=>{const a=[...(Array.isArray(b)?b:POSES[b])];a[22]=a[22]||0;for(const k in o){if(k==="bend")a[22]=o[k];else{a[k*2]=o[k][0];a[k*2+1]=o[k][1]}}return a};
+const MIR=b=>{const a=[...POSES[b]];for(let i=0;i<22;i+=2)a[i]=100-a[i];return a};
+const SH=(b,dy)=>{const a=[...(Array.isArray(b)?b:POSES[b])];for(let i=1;i<22;i+=2)a[i]+=dy;return a};
+Object.assign(POSES,{
+ souple:P("debout",{0:[50,16],1:[50,27],2:[50,55],3:[42,40],4:[42,52],5:[58,40],6:[58,52],7:[47,74],9:[53,74]}),
+ tc_bas:P("tc_ouverture",{0:[50,19],1:[50,30],2:[50,59],3:[42,46],4:[44,56],5:[58,46],6:[56,56],7:[45,76],9:[55,76]}),
+ tc_nuages_m:MIR("tc_nuages"),
+ tc_pousser_arr:P("tc_pousser",{0:[50,16],1:[49,27],2:[45,55],3:[54,38],4:[60,32],5:[55,39],6:[61,33]}),
+ tc_ballon_ouv:P("tc_ballon",{3:[34,40],4:[32,52],5:[66,40],6:[68,52]}),
+ bras_avant:P("debout",{3:[57,30],4:[69,31],5:[58,30],6:[70,30]}),
+ squat_bras:P("squat",{3:[64,44],4:[76,42],5:[65,45],6:[77,43]}),
+ debout_tete:P("debout",{3:[58,22],4:[56,12],5:[60,23],6:[57,13]}),
+ debout_gob:P("debout",{3:[56,40],4:[58,34],5:[57,41],6:[59,35]}),
+ debout_kb:P("debout",{3:[51,40],4:[52,55],5:[52,40],6:[53,55]}),
+ un_pied2:P("un_pied",{10:[70,78]}),
+ hanche_g:P("mains_hanches",{0:[52,14],1:[51,25],2:[45,53],7:[45,72],9:[50,72]}),
+ hanche_d:P("mains_hanches",{0:[48,14],1:[49,25],2:[55,53],7:[50,72],9:[55,72]}),
+ bras_cotes_h:P("bras_cotes",{3:[36,22],4:[22,17],5:[64,22],6:[78,17]}),
+ quatre_creux:P("quatre",{0:[84,44],bend:6}),
+ quatre_rond:P("quatre",{0:[79,60],bend:-8}),
+ quatre_fil:P("quatre",{5:[62,70],6:[54,78]}),
+ fente_mains:P("fente_rot",{5:[60,62],6:[62,89]}),
+ assis_9090_p:P("assis_9090",{0:[42,56],1:[44,65]}),
+ squat_profond2:P("squat_profond",{0:[54,48],1:[51,57]}),
+ allonge_in:P("allonge",{bend:-3}),
+ genoux_poitrine2:P("genoux_poitrine",{7:[48,66],8:[58,72],9:[49,67],10:[59,73],4:[48,70],6:[48,70]}),
+ jambe_mi:P("jambe_haut",{9:[66,70],10:[80,58],4:[64,64],6:[64,64]}),
+ figure4_p:P("figure4",{7:[60,64],8:[70,80],9:[48,62],10:[62,60]}),
+ allonge_genoux:P("torsion",{7:[56,72],8:[66,86],9:[57,73],10:[67,87]}),
+ fente_av:P("fente",{0:[49,27],1:[49,38],2:[49,63],9:[65,72]}),
+ papillon_p:P("papillon",{0:[50,58],1:[50,66]}),
+ enfant_in:P("enfant",{bend:-4}),
+ mur_pec2:P("mur_pec",{0:[56,14],1:[55,25],2:[54,53]}),
+ mollet_mur2:P("mollet_mur",{0:[76,26],1:[71,34],2:[52,56],9:[62,72]}),
+ halo_g:P("halo",{3:[36,22],4:[40,10],5:[50,18],6:[46,8]}),
+ halo_d:P("halo",{3:[50,18],4:[54,8],5:[64,22],6:[60,10]}),
+ bucheron_bas:P("bucheron",{0:[44,30],1:[46,40],2:[48,60],3:[40,56],4:[34,66],5:[41,57],6:[35,67],7:[44,76],9:[56,76]}),
+ debout_haut:P("debout",{3:[46,15],4:[48,4],5:[54,15],6:[52,4]}),
+ assis_v_g:P("assis_v",{3:[54,68],4:[56,68],5:[55,69],6:[58,69]}),
+ assis_v_d:P("assis_v",{3:[68,66],4:[74,66],5:[69,67],6:[75,67]}),
+ planche2:P("planche",{bend:-2}),
+ marche2:P("marche",{3:[60,37],4:[64,47],5:[46,38],6:[42,50],7:[58,70],8:[62,86],9:[42,71],10:[34,86]}),
+ marche_pente2:P("marche_pente",{3:[62,37],4:[66,46],5:[48,39],6:[44,50],7:[58,70],8:[64,80],9:[42,72],10:[36,84]}),
+ garde_saut:SH("garde",-4),
+ jab:P("garde",{3:[66,27],4:[80,26]}),
+ uppercut_av:P("garde",{3:[60,42],4:[66,26]})
+});
+POSES.bras_av2=P("bras_avant",{6:[70,37]});
+/* exercice -> [images clés, durée d'un cycle en secondes] */
+const ANIM={
+ tc_arbre:[["debout","souple"],8],tc_ouv:[["tc_bas","tc_ouverture"],8],tc_nuages:[["tc_nuages","tc_nuages_m"],6],
+ tc_pousser:[["tc_pousser_arr","tc_pousser"],8],tc_ballon:[["tc_ballon","tc_ballon_ouv"],8],tc_ferm:[["tc_ouverture","tc_ventre"],8],
+ sq_poids:[["bras_avant","squat_bras"],3],sq_charn:[["debout_tete","charniere_tete"],3],sq_gob:[["debout_gob","squat"],4],sq_dl:[["debout_kb","charniere"],4],
+ m_resp:[["debout","bras_haut"],8],m_chev:[["un_pied","un_pied2"],1.6],m_hanch:[["hanche_g","mains_hanches","hanche_d","mains_hanches"],3],
+ m_epaul:[["bras_cotes","bras_cotes_h"],1.4],m_chat:[["quatre_creux","quatre_rond"],6],m_thor:[["quatre_fil","quatre_rot"],4],
+ m_wgs:[["fente_mains","fente_rot"],4],m_9090:[["assis_9090","assis_9090_p"],6],m_sqprof:[["squat_profond","squat_profond2"],6],m_gm:[["debout_tete","charniere_tete"],3],
+ s_resp:[["allonge","allonge_in"],8],s_genoux:[["genoux_poitrine","genoux_poitrine2"],4],s_ischio:[["jambe_mi","jambe_haut"],8],
+ s_fig4:[["figure4","figure4_p"],8],s_tors:[["allonge_genoux","torsion"],8],s_psoas:[["fente","fente_av"],8],s_papil:[["papillon","papillon_p"],8],
+ s_enfant:[["enfant","enfant_in"],8],s_pec:[["mur_pec","mur_pec2"],8],s_cou:[["debout","tete_penchee"],8],
+ st_ischio:[["debout","ischio_debout"],6],st_quad:[["debout","quad_debout"],6],st_mollet:[["mollet_mur","mollet_mur2"],6],
+ b_halo:[["halo_g","halo","halo_d"],3],b_buch:[["bucheron","bucheron_bas"],3],b_squat:[["debout_haut","squat_haut"],4],
+ b_rus:[["assis_v_g","assis_v_d"],2.5],b_planche:[["planche","planche2"],4],b_cote:[["planche_cote"],4],
+ t_echauf:[["marche","marche2"],1.3],t_rapide:[["marche","marche2"],.9],t_pente:[["marche_pente","marche_pente2"],1.1],t_retour:[["marche","marche2"],1.5],
+ bx_saut:[["garde","garde_saut"],.5],bx_echauf:[["bras_cotes","bras_cotes_h"],1.5],
+ bx_jab:[["garde","jab","garde","direct"],1.6],bx_croc:[["garde","jab","direct","crochet","garde","esquive"],3],
+ bx_upp:[["garde","uppercut","garde","uppercut_av","crochet"],2.5],bx_combo:[["garde","jab","direct","crochet","esquive","direct"],2.8],
+ bx_def:[["garde","esquive","garde","jab","direct"],2.6],bx_vit:[["garde","jab","garde","direct"],.8],
+ dx_12:[["garde","jab","garde","direct"],1.8],dx_123:[["garde","jab","direct","crochet"],2.4],dx_upp:[["garde","jab","direct","uppercut"],2.4],
+ dx_libre:[["garde","jab","direct","crochet","garde","esquive"],3],dx_echange:[["debout","souple"],4],
+ bx_av:[["bras_avant","bras_av2"],6],repos:[["debout","souple"],4]};
+const PROPX={b_halo:"ball",b_buch:"ball",b_squat:"ball",b_rus:"ball",sq_gob:"kb",sq_dl:"kb2",s_pec:"wall:28",st_mollet:"wall:91",
+ t_echauf:"tread",t_rapide:"tread",t_retour:"tread",t_pente:"tread2",dx_12:"pad",dx_123:"pad",dx_upp:"pad",dx_libre:"pad",
+ m_chat:"mat",m_thor:"mat",m_9090:"mat",s_resp:"mat",s_genoux:"mat",s_ischio:"mat",s_fig4:"mat",s_tors:"mat",s_enfant:"mat",s_papil:"mat",b_rus:"mat",b_planche:"mat",b_cote:"mat"};
+function fig(p,pr){
+ const pt=i=>p[i*2].toFixed(1)+","+p[i*2+1].toFixed(1),L=(a,b,c)=>`<polyline points="${pt(a)} ${pt(b)}${c!=null?" "+pt(c):""}"/>`;
+ let x="";pr=pr||"";
+ const mx=(p[8]+p[12])/2,my=(p[9]+p[13])/2;
+ if(pr==="ball")x+=`<circle cx="${mx.toFixed(1)}" cy="${(my-4).toFixed(1)}" r="5" fill="currentColor" stroke="none" opacity=".75"/>`;
+ if(pr==="kb")x+=`<rect x="${(mx-4).toFixed(1)}" y="${(my-3).toFixed(1)}" width="8" height="9" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`;
+ if(pr==="kb2")x+=`<rect x="${(p[12]-4).toFixed(1)}" y="${p[13].toFixed(1)}" width="8" height="8" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`;
+ if(pr.startsWith("wall:")){const a=pr.slice(5);x+=`<line x1="${a}" y1="4" x2="${a}" y2="94" stroke-width="3" opacity=".35"/>`}
+ if(pr==="pad")x+=`<rect x="84" y="15" width="9" height="20" rx="3" fill="currentColor" stroke="none" opacity=".55"/><line x1="93" y1="25" x2="99" y2="32" stroke-width="3" opacity=".35"/>`;
+ if(pr==="mat")x+=`<line x1="4" y1="93" x2="96" y2="93" stroke-width="4" opacity=".25"/>`;
+ if(pr==="tread")x+=`<polyline points="10,93 90,93" stroke-width="5" opacity=".3"/><polyline points="82,93 78,40 70,40" stroke-width="2.5" opacity=".35"/>`;
+ if(pr==="tread2")x+=`<polyline points="10,93 90,80" stroke-width="5" opacity=".3"/><polyline points="82,82 78,36 70,36" stroke-width="2.5" opacity=".35"/>`;
  const floor=pr==="mat"||pr.startsWith("tread")?"":`<line x1="8" y1="93" x2="92" y2="93" stroke-width="1.5" opacity=".3"/>`;
+ const bend=p[22]||0,cx=(p[2]+p[4])/2,cy=(p[3]+p[5])/2+bend;
  return `<svg viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${floor}${x}
- <g opacity=".45">${L(1,3,4)}${L(2,7,8)}</g>${L(1,2)}${L(1,5,6)}${L(2,9,10)}<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--card)"/></svg>`;
+ <g opacity=".45">${L(1,3,4)}${L(2,7,8)}</g><path d="M${pt(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${pt(2)}"/>${L(1,5,6)}${L(2,9,10)}<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="var(--card)"/></svg>`;
 }
+const poseArr=k=>{const a=[...(POSES[k]||POSES.debout)];a[22]=a[22]||0;return a};
+function frameAt(id,now){
+ const an=ANIM[id]||[[EX[id]?EX[id][1]:"debout"],4],fr=an[0],n=fr.length;
+ if(n===1||reduceMotion)return poseArr(fr[Math.min(1,n-1)]);
+ const ph=((now/1000)%an[1])/an[1]*n,i=Math.floor(ph),f=ph-i,e=(1-Math.cos(Math.PI*f))/2;
+ const a=poseArr(fr[i]),b=poseArr(fr[(i+1)%n]);return a.map((v,j)=>v+(b[j]-v)*e);
+}
+const reduceMotion=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function poseSVG(k){return fig(poseArr(k))}
+function animEx(el,now){const id=el.dataset.ex;if(id)el.innerHTML=fig(frameAt(id,now),PROPX[id])}
+let lastAnim=0;
+function animLoop(now){
+ if(view.v==="sess"&&now-lastAnim>40){lastAnim=now;
+  document.querySelectorAll("[data-ex]").forEach(el=>{if(el.closest("details:not([open])"))return;animEx(el,now)})}
+ requestAnimationFrame(animLoop)}
+requestAnimationFrame(animLoop);
 
 /* ============ EXERCICES ============
    id: [nom, pose, consigne courte, explication détaillée, côtés?] */
@@ -423,7 +512,7 @@ function drawSession(app,s){
  <div class="btns"><button id="go">Démarrer</button><button id="skip">Passer</button><button id="reset">Recommencer</button></div>
  <p class="tot" id="tot"></p>
  <details><summary>Au programme (${S.length} étapes)</summary><ol class="plan">${S.map(x=>`<li>${esc(x.n)} <span>· ${fmt(x.d)}${x.sl?" · "+esc(x.sl):""}</span></li>`).join("")}</ol></details>
- <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" style="width:72px;height:72px;color:var(--work)">${poseSVG(EX[id][1])}</div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
+ <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" data-ex="${id}" style="width:72px;height:72px;color:var(--work)"></div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
  app.innerHTML=h;
  $("go").onclick=toggle;
  $("skip").onclick=()=>{if(el<0)el=0;else if(el<TOTAL){const k=stepAt(el);el=S[k+1]?starts[k+1]:TOTAL}last=performance.now();if(el>=TOTAL)finish();render()};
@@ -442,14 +531,14 @@ function finish(){el=TOTAL;run=false;lock(false);beep(523,1.4);say("Séance term
 function render(){
  if(view.v!=="sess"||!$("now"))return;
  let cls="",rem,dur,k,s,pk;
- if(el<0){rem=-el;dur=PREP;$("phase").textContent="Prépare-toi";$("name").textContent="Place-toi";$("sl").textContent="";$("cue").textContent="Ensuite : "+S[0].n+". "+S[0].c;$("midc").textContent="";$("next").textContent="";pk=S[0].pose}
- else if(el>=TOTAL){cls="calm";rem=0;dur=1;$("phase").textContent="Terminé";$("name").textContent="Bravo 🎉";$("sl").textContent="";$("cue").textContent="Bois un peu d'eau. C'est la régularité qui compte.";$("midc").textContent="";$("next").textContent="";pk="bras_haut"}
- else{k=stepAt(el);s=S[k];cls=s.t;rem=starts[k]+s.d-el;dur=s.d;pk=s.pose;
+ if(el<0){rem=-el;dur=PREP;$("phase").textContent="Prépare-toi";$("name").textContent="Place-toi";$("sl").textContent="";$("cue").textContent="Ensuite : "+S[0].n+". "+S[0].c;$("midc").textContent="";$("next").textContent="";pk=S[0].ex}
+ else if(el>=TOTAL){cls="calm";rem=0;dur=1;$("phase").textContent="Terminé";$("name").textContent="Bravo 🎉";$("sl").textContent="";$("cue").textContent="Bois un peu d'eau. C'est la régularité qui compte.";$("midc").textContent="";$("next").textContent="";pk="m_resp"}
+ else{k=stepAt(el);s=S[k];cls=s.t;rem=starts[k]+s.d-el;dur=s.d;pk=s.ex;
   $("phase").textContent=s.t==="work"?"Effort":(s.t==="rest"?"Repos":(s.sl||"En douceur"));
   $("name").textContent=s.n;$("sl").textContent=(s.t==="work"||s.ex==="dx_echange")?s.sl:"";$("cue").textContent=s.c;
   $("midc").textContent=(s.mid&&el-starts[k]>=s.mid)?s.mc:"";
   $("next").textContent=S[k+1]?"Ensuite : "+S[k+1].n+(S[k+1].t==="work"&&S[k+1].sl?", "+S[k+1].sl.toLowerCase():""):""}
- if(pk!==poseKey){poseKey=pk;$("pose").innerHTML=poseSVG(pk)}
+ if(pk!==poseKey){poseKey=pk;$("pose").dataset.ex=pk;animEx($("pose"),performance.now())}
  const br=$("br");
  if(s&&s.breath&&el>=0&&el<TOTAL){const p=((el%8)+8)%8;br.hidden=false;$("bt").textContent=p<4?"Inspire":"Expire";$("dot").style.transform=reduce?"none":"scale("+(.65+.65*(1-Math.cos(2*Math.PI*p/8))/2)+")"}else br.hidden=true;
  $("now").className="now "+cls;$("time").textContent=fmt(rem);$("fill").style.width=(100*(1-rem/dur))+"%";
