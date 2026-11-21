@@ -13,157 +13,422 @@
 <meta name="apple-mobile-web-app-title" content="Entraînement">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EEF0F3;--ink:#18212B;--soft:#5A6674;--rest:#6F7C89;--line:#D3D9E0;--on:#fff;--w1:#2447A8;--w2:#2F7561;
+:root{--bg:#EEF0F3;--card:#fff;--ink:#18212B;--soft:#5A6674;--rest:#6F7C89;--line:#D3D9E0;--on:#fff;--main:#2447A8;--work:var(--main);
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171D;--ink:#E6EAEF;--soft:#98A3B0;--rest:#6C7885;--line:#27303A;--on:#0B1220;--w1:#7FA3FF;--w2:#7CC4AE}}
-:root[data-theme="dark"]{--bg:#12171D;--ink:#E6EAEF;--soft:#98A3B0;--rest:#6C7885;--line:#27303A;--on:#0B1220;--w1:#7FA3FF;--w2:#7CC4AE}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#12171D;--card:#1B222B;--ink:#E6EAEF;--soft:#98A3B0;--rest:#6C7885;--line:#27303A;--on:#0B1220;--main:#7FA3FF}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
-main{max-width:480px;margin:0 auto;padding:20px 20px 48px}
-main[data-p="sq"]{--work:var(--w1)}main[data-p="tc"]{--work:var(--w2)}
-h1,h2,h3,.time,.phase{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif}
-h1{font-size:1.9rem;margin:0 0 12px;line-height:1.1}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.tab[aria-pressed="true"]{background:var(--work);color:var(--on);font-weight:700}
-.sub{color:var(--soft);margin:0 0 16px}
-.now{--cur:var(--soft);border-top:6px solid var(--cur);padding-top:12px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;-webkit-tap-highlight-color:transparent}
+main{max-width:480px;margin:0 auto;padding:18px 18px 48px}
+h1,h2,h3,.time,.phase,.big{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif}
+h1{font-size:1.9rem;margin:0 0 10px;line-height:1.1}
+h2{font-size:1.8rem;margin:4px 0 2px;line-height:1.1}
+h3{font-size:1.4rem;margin:22px 0 8px}
+.sub{color:var(--soft);margin:0 0 14px}
+button{font:inherit;border-radius:12px;border:2px solid var(--work);padding:10px 14px;min-height:48px;cursor:pointer;background:transparent;color:var(--ink)}
+button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.back{border:0;min-height:40px;padding:6px 0;color:var(--work);font-weight:700}
+/* profils */
+.users{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px}
+.users button{flex:none;min-height:40px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);font-weight:600}
+.users button.on{background:var(--main);border-color:var(--main);color:var(--on)}
+/* cartes */
+.card{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c,var(--main));border-radius:14px;padding:12px 14px;margin:0 0 10px;min-height:64px}
+.card .em{font-size:1.7rem;line-height:1}
+.card b{display:block;font-size:1.05rem}
+.card span{color:var(--soft);font-size:.88rem}
+.card .done{margin-left:auto;color:var(--c);font-weight:700;font-size:.85rem;white-space:nowrap}
+.today{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--c,var(--main));border-radius:16px;padding:14px 16px;margin:0 0 14px}
+.today .lbl{color:var(--soft);font-size:.9rem;text-transform:capitalize}
+.today .big{font-size:1.7rem;font-weight:700;line-height:1.15;margin:2px 0 4px}
+.today button{width:100%;background:var(--c);border-color:var(--c);color:#fff;font-weight:700;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}
+.stat b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.6rem;line-height:1.1}
+.stat span{font-size:.78rem;color:var(--soft)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.row button{flex:1 1 0;min-width:120px;border-color:var(--line);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.chip{font-size:.8rem;padding:2px 10px;border-radius:999px;background:var(--line);color:var(--ink)}
+.lv{display:flex;gap:6px;margin:4px 0 14px}
+.lv button{flex:1;min-height:52px;padding:4px 6px;border-color:var(--line);font-size:.95rem;line-height:1.2}
+.lv button[aria-pressed="true"]{background:var(--work);border-color:var(--work);color:#fff;font-weight:700}
+/* minuteur */
+.now{--cur:var(--soft);border-top:6px solid var(--cur);padding-top:10px}
 .now.work,.now.calm{--cur:var(--work)}.now.rest{--cur:var(--rest)}
-.phase{color:var(--cur);font-size:1.3rem;font-weight:700}
-.time{font-size:6.5rem;font-weight:700;line-height:1;margin:2px 0 8px}
+.phase{color:var(--cur);font-size:1.25rem;font-weight:700}
+.tline{display:flex;align-items:center;gap:12px}
+.time{font-size:5.6rem;font-weight:700;line-height:1;margin:2px 0 8px;flex:1}
+.pose{width:104px;height:104px;flex:none;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.pose svg{width:100%;height:100%}
 .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--cur)}
-.br{display:flex;align-items:center;gap:14px;height:64px;margin-top:8px;color:var(--work);font-weight:700;font-size:1.2rem}
+.br{display:flex;align-items:center;gap:14px;height:60px;margin-top:8px;color:var(--work);font-weight:700;font-size:1.15rem}
 .br[hidden]{display:none}
-.dot{width:44px;height:44px;border-radius:50%;border:2px solid var(--work);background:var(--work);opacity:.3;transition:transform .15s linear}
-.now h2{font-size:2rem;margin:12px 0 0;line-height:1.1}
+.dot{width:42px;height:42px;border-radius:50%;background:var(--work);opacity:.3;transition:transform .15s linear}
+.now h2{font-size:1.9rem;margin:10px 0 0}
 .sl{color:var(--soft);font-weight:600}
-.now p{margin:8px 0 0;font-size:1.05rem}
+.now p{margin:6px 0 0;font-size:1.05rem}
+.mid{color:var(--work);font-weight:700}
 .next{color:var(--soft);font-size:.95rem!important}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
-button{font:inherit;border-radius:12px;border:2px solid var(--work);padding:12px 14px;min-height:52px;cursor:pointer;background:transparent;color:var(--ink)}
-button:focus-visible,summary:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-#go{flex:1 1 100%;background:var(--work);color:var(--on);font-weight:700;font-size:1.15rem}
-.tot{color:var(--soft);margin:0 0 26px}
-h3{font-size:1.5rem;margin:0 0 6px}
-details{border-top:1px solid var(--line);padding:10px 0}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 8px}
+#go{flex:1 1 100%;background:var(--work);color:#fff;font-weight:700;font-size:1.15rem}
+.btns button:not(#go){flex:1}
+.tot{color:var(--soft);margin:0 0 8px}
+details{border-top:1px solid var(--line);padding:8px 0}
 details:last-of-type{border-bottom:1px solid var(--line)}
 summary{font-weight:700;cursor:pointer;padding:6px 0}
-details p{margin:6px 0}details ul{margin:4px 0 8px;padding-left:20px}
+details p{margin:6px 0}details ul,details ol{margin:4px 0 8px;padding-left:20px}
+.plan li{margin:2px 0}.plan span{color:var(--soft)}
+/* semaine, historique, profils */
+.wk{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:0 0 8px}
+.wk b{width:84px;flex:none}
+select,input[type=text]{font:inherit;flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 10px;min-width:0}
+.hday{color:var(--soft);font-weight:700;margin:14px 0 6px;text-transform:capitalize}
+.hitem{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;padding:8px 8px 8px 12px;margin:0 0 6px}
+.hitem div{flex:1}.hitem span{color:var(--soft);font-size:.85rem}
+.hitem button{border:0;min-height:40px;padding:4px 10px;color:var(--soft)}
+.empty{color:var(--soft);text-align:center;padding:30px 10px}
+.save{width:100%;background:var(--main);border-color:var(--main);color:var(--on);font-weight:700;margin-top:8px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.92rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.dot{transition:none}}
 </style>
 </head>
 <body>
-<main id="app" data-p="tc">
-<h1>Mon entraînement</h1>
-<div class="tabs"><button class="tab" id="t-tc" aria-pressed="true">Tai Chi, 7 min</button><button class="tab" id="t-sq" aria-pressed="false">Squat et soulevé, 20 min</button></div>
-<p class="sub" id="sub"></p>
-<section class="now" id="now" aria-live="polite">
-<div class="phase" id="phase"></div>
-<div class="time" id="time"></div>
-<div class="bar"><i id="fill"></i></div>
-<div class="br" id="br" hidden><span class="dot" id="dot"></span><span id="bt"></span></div>
-<h2 id="name"></h2><div class="sl" id="sl"></div>
-<p id="cue"></p><p class="next" id="next"></p>
-</section>
-<div class="btns"><button id="go">Démarrer</button><button id="skip">Passer</button><button id="reset">Recommencer</button><button id="snd" aria-pressed="true">Son : oui</button></div>
-<p class="tot" id="tot"></p>
-<h3>Comment faire</h3>
-<div id="det"></div>
-</main>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
 <script>
-var TC=[
-["L’arbre",45,"Pieds largeur d’épaules, genoux souples, la tête tirée par un fil. Respire dans le ventre."],
-["Ouverture",60,"Tu inspires : les poignets montent à hauteur d’épaules. Tu expires : les genoux plient, les mains descendent devant le ventre."],
-["Les nuages",90,"Poids à droite, main droite en haut, main gauche en bas. Poids à gauche, les mains changent. C’est la taille qui tourne."],
-["Repousser",90,"Un petit pas en avant, talon d’abord. Tu expires : le poids avance, les mains poussent. Tu inspires : tu reviens. 6 fois."],
-["Le ballon",60,"Mains face à face devant le ventre. Tu inspires : elles s’écartent. Tu expires : elles se rapprochent."],
-["Fermeture",75,"Mains vers l’avant puis au ventre, 3 fois. Paumes sur le ventre, 3 respirations. Secoue les mains."]];
-var SQ=[];
-function add(a,n,d,c,t,sl){a.push({n:n,d:d,c:c,t:t,sl:sl||""});}
-var P={tc:{prep:5,steps:[],sub:"Lent comme dans du miel. Genoux souples, épaules lourdes.",pc:"Pieds largeur d’épaules, bras relâchés. Place-toi tranquillement.",tip:true},
-sq:{prep:10,steps:SQ,sub:"Dos plat, ventre serré, mouvements lents.",pc:"Tenue souple, 2 mètres d’espace libre. Tu commences sans charge.",tip:false}};
-TC.forEach(function(m,k){add(P.tc.steps,m[0],m[1],m[2],"calm","Mouvement "+(k+1)+" sur 6");});
-P.tc.steps[3].mid=45;P.tc.steps[3].mc="Change de jambe : pied opposé devant, 6 nouvelles poussées.";
-add(SQ,"Squat au poids du corps",90,"Sans charge. Descends comme pour t’asseoir sur une chaise, remonte en poussant le sol. Lent et propre.","calm","Échauffement");
-add(SQ,"Charnière de hanches",90,"Mains derrière la tête, genoux souples. Recule les fesses comme pour fermer une porte, dos plat, puis reviens debout.","calm","Échauffement");
-var i;
-for(i=1;i<=4;i++){add(SQ,"Squat gobelet",45,"Gilet de 10 kg, un poids de 10 kg contre la poitrine. Descends en 3 secondes, 1 seconde en bas, remonte en 1 seconde.","work","Série "+i+" sur 4");
-add(SQ,"Repos",60,i<4?"Respire profondément et secoue les jambes.":"Pose le poids du squat. Prends les 2 poids de 10 kg et mets le gilet de 4 kg.","rest");}
-for(i=1;i<=4;i++){add(SQ,"Soulevé de terre",45,"Un poids de 10 kg dans chaque main. Recule les fesses, dos plat, les poids longent les cuisses. Descends en 3 secondes, remonte en 1.","work","Série "+i+" sur 4");
-add(SQ,"Repos",60,i<4?"Respire profondément, secoue les bras et les jambes.":"Pose les poids et retire le gilet. Bois un peu d’eau.","rest");}
-add(SQ,"Étirement arrière des cuisses",90,"Talon devant, jambe tendue, buste penché dos plat. 45 secondes par jambe, sans à-coups.","calm","Retour au calme");
-add(SQ,"Étirement avant des cuisses",90,"Debout, attrape ton pied derrière toi, hanches vers l’avant. 45 secondes par jambe.","calm","Retour au calme");
-var DET={
-tc:'<details open><summary>Les 3 règles d’or</summary><ul><li>Genoux souples, jamais tendus comme des piquets.</li><li>Épaules lourdes, comme un manteau mouillé.</li><li>Le poids passe d’une jambe à l’autre comme de l’eau d’un verre à l’autre. Lent comme dans du miel, respire par le nez.</li></ul></details>'
-+'<details><summary>1. L’arbre</summary><p>Pieds largeur d’épaules, parallèles, genoux légèrement pliés, bras le long du corps. Un fil tire le sommet de ta tête vers le plafond. Respire dans le ventre : il gonfle en inspirant, il se creuse en expirant.</p></details>'
-+'<details><summary>2. Ouverture</summary><p>Inspire : les poignets montent devant toi jusqu’aux épaules, paumes vers le bas, coudes souples. Expire : les genoux plient et les mains descendent devant le ventre, comme pour appuyer sur une éponge. Tout le corps bouge ensemble.</p></details>'
-+'<details><summary>3. Les nuages</summary><p>Pieds un peu plus écartés. Poids à droite : main droite devant le visage (hauteur du menton, paume vers toi), main gauche devant le ventre. Poids à gauche : la taille tourne et les mains changent. Tu caresses un gros ballon. C’est la taille qui fait tourner les bras, pas les bras tout seuls.</p></details>'
-+'<details><summary>4. Repousser</summary><p>Petit pas en avant du pied gauche, talon d’abord, comme sur des œufs. Mains devant la poitrine, paumes vers l’avant. Expire : le poids glisse vers l’avant (60 %) et les mains poussent doucement, comme un chariot sur du velours. Inspire : tu reviens. 6 fois, puis change de jambe. Le genou avant ne dépasse jamais la pointe du pied.</p></details>'
-+'<details><summary>5. Le ballon</summary><p>Mains face à face devant le ventre. Inspire : les mains s’écartent, le ballon grossit. Expire : elles se rapprochent sans se toucher. Les jambes ne bougent pas. Sens la chaleur entre tes paumes.</p></details>'
-+'<details><summary>6. Fermeture</summary><p>Inspire en levant les mains devant toi, expire en les ramenant au ventre, 3 fois. Paumes sur le bas du ventre, yeux fermés, 3 respirations. Secoue doucement les mains et les poignets.</p></details>'
-+'<details><summary>Conseils</summary><p>Semaine 1 : 2 mouvements par jour suffisent. Dès la semaine 2 : les 6 d’affilée. Si tes genoux gênent, plie moins les jambes. Plus c’est lent, mieux c’est.</p></details>',
-sq:'<details open><summary>Les règles d’or</summary><ul><li>Le dos reste plat comme une table, jamais rond comme un chat qui fait le dos.</li><li>Ventre serré avant chaque répétition, comme si on allait te donner un petit coup.</li><li>Regard droit devant, menton légèrement rentré.</li><li>Une douleur vive au dos ou au genou : tu t’arrêtes. Un muscle qui brûle, c’est normal.</li></ul></details>'
-+'<details><summary>Squat gobelet : gilet 10 kg + un poids de 10 kg</summary><p><b>Départ.</b> Gilet bien serré. Tiens le poids à deux mains contre ta poitrine, coudes vers le bas, comme un gobelet précieux. Pieds largeur d’épaules, pointes un peu ouvertes.</p><ul><li>Inspire et serre le ventre.</li><li>Descends en 3 secondes, comme pour t’asseoir sur une chaise derrière toi. Les genoux suivent la direction des pointes de pieds.</li><li>En bas (cuisses à l’horizontale si tu peux), marque 1 seconde.</li><li>Expire et remonte en 1 seconde en poussant le sol avec tout le pied.</li></ul><p><b>Erreurs.</b> Talons qui décollent (écarte un peu plus les pieds), genoux qui rentrent, dos qui s’arrondit, poids qui s’éloigne de la poitrine.</p><p><b>Charge.</b> Vise 8 à 10 répétitions en 45 s. Moins de 6 : trop lourd. Plus de 12 : tiens les 2 poids de 10 kg contre les épaules.</p></details>'
-+'<details><summary>Soulevé de terre : 2 poids de 10 kg + gilet de 4 kg</summary><p><b>Départ.</b> Pieds largeur de hanches, un poids dans chaque main, devant les cuisses, paumes vers toi. Genoux légèrement pliés, et ils le restent. Épaules en arrière et vers le bas.</p><ul><li>Inspire et serre le ventre.</li><li>Recule les fesses comme pour fermer une porte avec elles. Le buste penche, le dos reste plat, les poids glissent le long des cuisses.</li><li>Descends en 3 secondes jusqu’aux genoux, ou jusqu’à sentir l’arrière des cuisses tirer. Pas plus bas si le dos s’arrondit.</li><li>Expire, pousse les pieds dans le sol, avance les hanches et remonte en 1 seconde. En haut, serre les fesses sans te pencher en arrière.</li></ul><p><b>Erreurs.</b> Dos rond, poids loin des jambes, genoux qui plient comme pour un squat, tête qui regarde le plafond.</p><p><b>Progression.</b> Quand 10 répétitions deviennent faciles sur toutes les séries : gilet de 10 kg (30 kg au total).</p></details>'
-+'<details><summary>Étirements de fin</summary><p><b>Arrière des cuisses (45 s par jambe).</b> Talon posé devant toi, jambe tendue, penche le buste dos plat jusqu’à sentir un tirage doux.</p><p><b>Avant des cuisses (45 s par jambe).</b> Debout, attrape ton pied derrière toi, genoux proches, hanches vers l’avant. Appuie-toi sur un mur.</p></details>'};
-var $=function(x){return document.getElementById(x)};
-var prog="tc",S,PREP,TOTAL,starts,el,run=false,last=0,idx=-2,sec=-1,sound=true,ctx=null,wl=null;
-var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-function fmt(t){t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+":"+("0"+t%60).slice(-2);}
-function beep(f,d){if(!sound||!ctx)return;try{var o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;o.type="sine";o.frequency.value=f;o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d);}catch(e){}}
-function lock(on){try{if(on&&navigator.wakeLock){navigator.wakeLock.request("screen").then(function(l){wl=l;}).catch(function(){});}else if(wl){wl.release();wl=null;}}catch(e){}}
-function stepAt(t){var k,r=0;for(k=0;k<S.length;k++){if(t>=starts[k])r=k;}return r;}
-function setProg(k){
- run=false;lock(false);prog=k;S=P[k].steps;PREP=P[k].prep;TOTAL=0;starts=[];
- S.forEach(function(s){starts.push(TOTAL);TOTAL+=s.d;});
- el=-PREP;idx=-2;sec=-1;
- $("app").setAttribute("data-p",k);
- ["tc","sq"].forEach(function(x){$("t-"+x).setAttribute("aria-pressed",String(x===k));});
- $("sub").textContent=P[k].sub;$("det").innerHTML=DET[k];
- try{localStorage.setItem("prog",k);}catch(e){}
+"use strict";
+/* ============ SCHÉMAS (bonhommes) ============
+   pose = [tête, épaules, bassin, coudeG, mainG, coudeD, mainD, genouG, piedG, genouD, piedD] (x,y sur 100×100) + accessoires */
+const POSES={
+ debout:[50,14,50,25,50,53,45,39,44,53,55,39,56,53,48,72,47,91,52,72,53,91],
+ bras_haut:[50,16,50,27,50,55,44,15,42,4,56,15,58,4,48,74,47,91,52,74,53,91],
+ bras_cotes:[50,14,50,25,50,53,36,26,22,25,64,26,78,25,48,72,47,91,52,72,53,91],
+ mains_hanches:[50,14,50,25,50,53,38,36,45,50,62,36,55,50,48,72,47,91,52,72,53,91],
+ un_pied:[50,14,50,25,50,53,40,38,40,52,60,38,60,52,49,72,49,91,58,70,66,82],
+ tete_penchee:[44,16,50,26,50,54,45,40,44,54,58,20,46,10,48,73,47,91,52,73,53,91],
+ squat:[58,34,53,43,37,66,62,50,68,47,63,51,69,48,58,69,50,91,60,70,52,91],
+ squat_profond:[54,46,51,55,44,77,58,63,55,60,59,64,56,61,62,70,52,91,63,71,54,91],
+ squat_haut:[56,38,52,47,38,68,56,30,60,18,57,31,61,19,58,70,50,91,60,71,52,91],
+ charniere:[72,33,65,37,40,53,64,49,64,61,66,49,66,61,44,72,46,91,46,72,48,91],
+ charniere_tete:[72,33,65,37,40,53,62,30,70,28,63,31,71,29,44,72,46,91,46,72,48,91],
+ quatre:[82,49,72,55,36,56,72,72,72,89,73,72,73,89,36,89,16,89,37,89,17,89],
+ quatre_rot:[82,49,72,55,36,56,72,72,72,89,70,42,68,28,36,89,16,89,37,89,17,89],
+ fente_rot:[54,29,52,39,44,62,56,62,58,89,56,27,60,15,30,86,13,89,62,71,63,91],
+ fente:[45,27,45,38,44,62,52,51,60,64,53,51,61,64,30,86,13,89,62,71,63,91],
+ assis_9090:[50,47,50,58,50,83,40,72,36,85,60,72,64,85,30,85,40,90,72,84,72,92],
+ papillon:[50,49,50,60,50,84,40,74,48,88,60,74,52,88,30,80,46,90,70,80,54,90],
+ assis_v:[63,51,57,60,40,83,63,70,67,70,64,70,68,70,60,72,75,84,61,73,76,85],
+ allonge:[14,85,24,86,56,86,40,88,52,88,40,88,52,88,72,86,90,88,73,86,91,88],
+ genoux_poitrine:[14,85,24,86,52,86,38,76,52,70,38,76,52,70,52,68,64,76,53,69,65,77],
+ jambe_haut:[14,85,24,86,56,86,38,72,58,48,38,72,58,48,72,86,90,88,58,64,60,42],
+ figure4:[14,85,24,86,52,86,40,80,52,74,40,80,52,74,66,68,76,86,53,68,66,66],
+ torsion:[14,85,24,86,52,86,22,74,22,62,30,92,38,92,62,78,70,90,63,80,71,92],
+ enfant:[66,84,58,82,30,80,74,86,88,88,74,86,88,88,44,88,22,90,44,88,22,90],
+ mur_pec:[52,14,52,25,52,53,40,25,30,24,58,38,58,52,50,72,49,91,54,72,55,91],
+ planche:[84,62,75,65,44,70,75,88,87,88,76,88,88,88,28,78,12,87,29,79,13,88],
+ planche_cote:[84,58,75,62,44,70,75,80,75,89,76,46,76,30,28,78,12,88,29,79,13,88],
+ ischio_debout:[66,34,60,40,44,56,62,52,64,64,63,52,65,64,44,72,42,91,64,76,76,91],
+ quad_debout:[50,14,50,25,50,53,42,38,42,52,44,42,38,60,48,72,47,91,50,74,38,62],
+ mollet_mur:[72,24,68,33,48,56,78,32,88,30,79,33,89,31,40,74,30,91,58,72,60,91],
+ marche:[54,14,53,25,50,53,46,38,42,50,60,37,64,47,42,71,34,86,58,70,62,86],
+ marche_pente:[57,15,55,26,50,53,48,39,44,50,62,37,66,46,42,72,36,84,58,70,64,80],
+ halo:[50,14,50,26,50,54,38,18,46,6,62,18,54,6,48,73,47,91,52,73,53,91],
+ bucheron:[50,15,50,26,50,54,58,18,66,8,60,19,67,9,46,73,45,91,54,73,55,91],
+ tc_ouverture:[50,16,50,27,50,56,44,36,40,28,56,36,60,28,46,74,45,91,54,74,55,91],
+ tc_nuages:[50,14,50,25,50,54,40,28,46,18,60,44,56,54,46,73,42,91,54,73,58,91],
+ tc_pousser:[56,16,55,27,50,55,62,32,72,30,63,33,73,31,40,74,32,91,62,73,64,91],
+ tc_ballon:[50,14,50,25,50,54,40,40,42,52,60,40,58,52,46,73,45,91,54,73,55,91],
+ tc_ventre:[50,14,50,25,50,54,40,42,48,52,60,42,52,52,46,73,45,91,54,73,55,91]};
+const PROPS={squat_haut:"ball:61,13",halo:"ball:50,4",bucheron:"ball:68,5",assis_v:"ball:68,66",
+ squat:"kb:69,49",charniere:"kb2:65,64",mur_pec:"wall:28",mollet_mur:"wall:91",marche:"tread",marche_pente:"tread2",
+ allonge:"mat",genoux_poitrine:"mat",jambe_haut:"mat",figure4:"mat",torsion:"mat",enfant:"mat",planche:"mat",planche_cote:"mat",quatre:"mat",quatre_rot:"mat",assis_9090:"mat",papillon:"mat",assis_v:"mat"};
+function poseSVG(k){
+ const p=POSES[k]||POSES.debout,pt=i=>p[i*2]+","+p[i*2+1],L=(a,b,c)=>`<polyline points="${pt(a)} ${pt(b)}${c!=null?" "+pt(c):""}" />`;
+ let x="",pr=PROPS[k]||"";
+ if(pr.startsWith("ball"))  {const [a,b]=pr.slice(5).split(",");x+=`<circle cx="${a}" cy="${b}" r="5" fill="currentColor" stroke="none" opacity=".75"/>`}
+ if(pr.startsWith("kb:"))   {const [a,b]=pr.slice(3).split(",");x+=`<rect x="${a-4}" y="${b-4}" width="8" height="9" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`}
+ if(pr.startsWith("kb2"))   {const [a,b]=pr.slice(4).split(",");x+=`<rect x="${a-4}" y="${b}" width="8" height="8" rx="2" fill="currentColor" stroke="none" opacity=".75"/>`}
+ if(pr.startsWith("wall"))  {const a=pr.slice(5);x+=`<line x1="${a}" y1="4" x2="${a}" y2="94" stroke-width="3" opacity=".35"/>`}
+ if(pr==="mat")             x+=`<line x1="4" y1="93" x2="96" y2="93" stroke-width="4" opacity=".25"/>`;
+ if(pr==="tread")           x+=`<polyline points="10,93 90,93" stroke-width="5" opacity=".3"/><polyline points="82,93 78,40 70,40" stroke-width="2.5" opacity=".35" fill="none"/>`;
+ if(pr==="tread2")          x+=`<polyline points="10,93 90,80" stroke-width="5" opacity=".3"/><polyline points="82,82 78,36 70,36" stroke-width="2.5" opacity=".35" fill="none"/>`;
+ const floor=pr==="mat"||pr.startsWith("tread")?"":`<line x1="8" y1="93" x2="92" y2="93" stroke-width="1.5" opacity=".3"/>`;
+ return `<svg viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${floor}${x}
+ <g opacity=".45">${L(1,3,4)}${L(2,7,8)}</g>${L(1,2)}${L(1,5,6)}${L(2,9,10)}<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--card)"/></svg>`;
+}
+
+/* ============ EXERCICES ============
+   id: [nom, pose, consigne courte, explication détaillée, côtés?] */
+const EX={
+ // Tai Chi
+ tc_arbre:["L'arbre","debout","Pieds largeur d'épaules, genoux souples, la tête tirée par un fil. Respire dans le ventre.","Pieds parallèles, genoux légèrement pliés, bras le long du corps. Un fil tire le sommet de ta tête vers le plafond. Le ventre gonfle en inspirant et se creuse en expirant."],
+ tc_ouv:["Ouverture","tc_ouverture","Tu inspires : les poignets montent à hauteur d'épaules. Tu expires : les genoux plient, les mains descendent devant le ventre.","Inspire : les poignets montent devant toi jusqu'aux épaules, paumes vers le bas, coudes souples. Expire : les genoux plient et les mains descendent, comme pour appuyer sur une éponge. Tout le corps bouge ensemble."],
+ tc_nuages:["Les nuages","tc_nuages","Poids à droite, main droite en haut, main gauche en bas. Poids à gauche, les mains changent. C'est la taille qui tourne.","Pieds un peu plus écartés. Poids à droite : main droite devant le visage, main gauche devant le ventre. Poids à gauche : la taille tourne et les mains changent. C'est la taille qui fait tourner les bras."],
+ tc_pousser:["Repousser","tc_pousser","Un petit pas en avant, talon d'abord. Tu expires : le poids avance, les mains poussent. Tu inspires : tu reviens. 6 fois.","Petit pas en avant, talon d'abord. Expire : le poids glisse vers l'avant et les mains poussent doucement. Inspire : tu reviens. 6 fois, puis change de jambe. Le genou avant ne dépasse jamais la pointe du pied.",true],
+ tc_ballon:["Le ballon","tc_ballon","Mains face à face devant le ventre. Tu inspires : elles s'écartent. Tu expires : elles se rapprochent.","Inspire : les mains s'écartent, le ballon grossit. Expire : elles se rapprochent sans se toucher. Les jambes ne bougent pas."],
+ tc_ferm:["Fermeture","tc_ventre","Mains vers l'avant puis au ventre, 3 fois. Paumes sur le ventre, 3 respirations. Secoue les mains.","Inspire en levant les mains devant toi, expire en les ramenant au ventre, 3 fois. Paumes sur le bas du ventre, yeux fermés, 3 respirations."],
+ // Renforcement
+ sq_poids:["Squat au poids du corps","squat_profond","Sans charge. Descends comme pour t'asseoir sur une chaise, remonte en poussant le sol. Lent et propre.","Pieds largeur d'épaules, pointes un peu ouvertes. Descends en reculant les fesses, genoux dans l'axe des pieds, dos plat. Remonte en poussant le sol avec tout le pied."],
+ sq_charn:["Charnière de hanches","charniere_tete","Mains derrière la tête, genoux souples. Recule les fesses comme pour fermer une porte, dos plat, puis reviens debout.","Genoux légèrement pliés, ils ne bougent pas. Recule les fesses, le buste penche, le dos reste plat. Remonte en avançant les hanches et en serrant les fesses."],
+ sq_gob:["Squat gobelet","squat","Gilet de 10 kg, un poids de 10 kg contre la poitrine. Descends en 3 secondes, 1 seconde en bas, remonte en 1 seconde.","Gilet serré, poids tenu à deux mains contre la poitrine, coudes vers le bas. Inspire et serre le ventre, descends en 3 s, marque 1 s en bas, expire et remonte en 1 s. Erreurs : talons qui décollent, genoux qui rentrent, dos qui s'arrondit. Vise 8 à 10 répétitions en 45 s."],
+ sq_dl:["Soulevé de terre","charniere","Un poids de 10 kg dans chaque main. Recule les fesses, dos plat, les poids longent les cuisses. Descends en 3 secondes, remonte en 1.","Gilet de 4 kg, un poids dans chaque main devant les cuisses. Genoux légèrement pliés. Recule les fesses, les poids glissent le long des cuisses jusqu'aux genoux, dos plat. Remonte en avançant les hanches. Quand 10 répétitions deviennent faciles : gilet de 10 kg."],
+ // Mobilité
+ m_resp:["Respiration debout","bras_haut","Inspire en levant les bras au ciel, expire en les redescendant. Lentement.","Pieds largeur de hanches. Inspire par le nez en levant les bras sur les côtés jusqu'au-dessus de la tête, expire par la bouche en les redescendant. 4 secondes pour monter, 4 pour descendre."],
+ m_chev:["Cercles des chevilles","un_pied","Sur une jambe (tiens-toi au mur si besoin), dessine de grands cercles avec la pointe du pied.","Tiens un mur ou une chaise. Pied levé, dessine des cercles lents et amples, dans un sens puis dans l'autre.",true],
+ m_hanch:["Cercles des hanches","mains_hanches","Mains sur les hanches, dessine de grands cercles avec le bassin. Change de sens à mi-temps.","Pieds un peu plus larges que les hanches, genoux souples. Fais des cercles amples avec le bassin, le haut du corps reste calme."],
+ m_epaul:["Cercles des épaules","bras_cotes","Bras tendus sur les côtés, petits cercles puis grands cercles. Change de sens à mi-temps.","Bras à hauteur d'épaules, paumes vers le bas. Commence par de petits cercles et agrandis-les. Épaules basses, loin des oreilles."],
+ m_chat:["Chat-vache","quatre","À quatre pattes. Inspire : creuse le dos, regarde devant. Expire : arrondis le dos, menton vers la poitrine.","Mains sous les épaules, genoux sous les hanches. Inspire en creusant le dos et en relevant la tête, expire en arrondissant le dos comme un chat. Bouge vertèbre par vertèbre, sans forcer."],
+ m_thor:["Rotations du haut du dos","quatre_rot","À quatre pattes, une main derrière la tête. Le coude descend vers le bras d'appui, puis s'ouvre vers le plafond.","Garde le bassin immobile au-dessus des genoux. Suis ton coude des yeux quand il monte. Expire en ouvrant.",true],
+ m_wgs:["Fente avec rotation","fente_rot","Grande fente, mains au sol. Le bras côté jambe avant monte vers le plafond, puis redescend. Change de côté à mi-temps.","Pied avant à plat, genou arrière au sol si besoin. Mains au sol à l'intérieur du pied avant. Ouvre la poitrine en levant le bras vers le plafond, regarde ta main. Étire l'avant de la hanche arrière.",true],
+ m_9090:["Hanches 90/90","assis_9090","Assis, une jambe pliée devant, l'autre pliée sur le côté. Buste droit, penche-toi doucement vers le genou avant.","Les deux genoux forment un angle droit. Grandis-toi, puis avance le buste dos plat vers le tibia avant. Respire, puis change de côté en faisant pivoter les deux genoux.",true],
+ m_sqprof:["Squat profond tenu","squat_profond","Descends le plus bas possible, talons au sol, coudes poussant les genoux vers l'extérieur. Respire.","Pieds un peu plus larges que les épaules. Si les talons décollent, glisse un livre dessous ou tiens-toi à un meuble. Reste détendu, le dos le plus droit possible."],
+ m_gm:["Bonjour (charnière)","charniere_tete","Mains derrière la tête, recule les fesses, dos plat, jusqu'à sentir l'arrière des cuisses. Remonte.","Genoux souples et fixes. Le mouvement vient des hanches. Lent et contrôlé, sans arrondir le dos."],
+ // Étirements
+ s_resp:["Respiration allongée","allonge","Sur le dos, une main sur le ventre. Inspire en gonflant le ventre, expire longuement.","Allonge-toi, genoux pliés si c'est plus confortable. Expire deux fois plus longtemps que tu n'inspires. Laisse les épaules se relâcher."],
+ s_genoux:["Genoux à la poitrine","genoux_poitrine","Sur le dos, ramène les genoux vers la poitrine. Berce-toi doucement de gauche à droite.","Tiens tes genoux avec les mains. Le bas du dos se pose au sol. Petits balancements pour masser le dos."],
+ s_ischio:["Arrière des cuisses allongé","jambe_haut","Sur le dos, une jambe tendue vers le plafond, tenue avec une serviette. L'autre reste au sol.","Passe une serviette sous le pied. Jambe aussi tendue que possible sans douleur, tirage doux. Respire et relâche un peu plus à chaque expiration.",true],
+ s_fig4:["Pigeon allongé","figure4","Sur le dos, cheville posée sur le genou opposé. Rapproche doucement les jambes de la poitrine.","Pose la cheville juste au-dessus du genou. Passe les mains derrière la cuisse d'appui et tire doucement. Tu dois sentir l'étirement dans la fesse.",true],
+ s_tors:["Torsion allongée","torsion","Sur le dos, bras en croix. Laisse tomber les deux genoux d'un côté, regarde de l'autre côté.","Les épaules restent au sol. Laisse le poids des jambes faire le travail. Respire dans les côtes.",true],
+ s_psoas:["Fente basse","fente","Genou arrière au sol, pied avant devant. Avance doucement le bassin, buste droit.","Mets un coussin sous le genou arrière. Serre légèrement les fesses et avance le bassin : l'étirement se fait à l'avant de la hanche arrière. Ne cambre pas.",true],
+ s_papil:["Papillon","papillon","Assis, plantes des pieds l'une contre l'autre. Laisse tomber les genoux, dos droit.","Tiens tes pieds avec les mains. Grandis-toi, puis penche légèrement le buste vers l'avant si c'est confortable. Ne force pas sur les genoux."],
+ s_enfant:["Posture de l'enfant","enfant","Fesses sur les talons, front au sol, bras allongés devant. Respire dans le dos.","Écarte un peu les genoux si besoin. Laisse le front se poser, relâche les épaules. Chaque inspiration gonfle le dos."],
+ s_pec:["Pectoraux au mur","mur_pec","Avant-bras contre un mur, à hauteur d'épaule. Tourne doucement le buste à l'opposé.","Coude à hauteur d'épaule, avant-bras collé au mur. Fais un petit pas en avant et tourne le buste jusqu'à sentir l'avant de l'épaule et la poitrine s'étirer.",true],
+ s_cou:["Étirement du cou","tete_penchee","Penche doucement l'oreille vers l'épaule. L'autre épaule descend vers le sol.","Tu peux poser la main sur la tête sans tirer, juste son poids. Respire calmement, sans à-coups.",true],
+ st_ischio:["Arrière des cuisses debout","ischio_debout","Talon devant, jambe tendue, buste penché dos plat. Change de jambe à mi-temps.","Pointe de pied vers toi, l'autre genou plié. Recule les fesses en gardant le dos plat jusqu'à un tirage doux.",true],
+ st_quad:["Avant des cuisses debout","quad_debout","Debout, attrape ton pied derrière toi, hanches vers l'avant. Change à mi-temps.","Genoux proches l'un de l'autre, appuie-toi sur un mur. Serre les fesses pour accentuer l'étirement.",true],
+ st_mollet:["Mollets au mur","mollet_mur","Mains au mur, une jambe tendue derrière, talon au sol. Penche-toi vers le mur.","Pied arrière bien à plat, pointe vers l'avant. Plie le genou avant pour approcher le mur. Change de jambe à mi-temps.",true],
+ // Ballon
+ b_halo:["Halo au ballon","halo","Ballon à deux mains, fais-le tourner autour de ta tête, près du crâne. Change de sens à mi-temps.","Ventre serré, le bassin ne bouge pas. Le ballon passe derrière la tête, au ras de la nuque. Respire normalement."],
+ b_buch:["Bûcheron au ballon","bucheron","Ballon en haut d'un côté, descends-le en diagonale vers la hanche opposée en pliant les genoux. Change de côté à mi-temps.","Pivote sur le pied arrière quand le ballon descend. Remonte en contrôlant. Le dos reste long, le mouvement vient des hanches et du buste.",true],
+ b_squat:["Squat ballon au-dessus de la tête","squat_haut","Ballon tenu bras tendus au-dessus de la tête. Descends en squat, bras toujours en haut.","Si les épaules tirent, tiens le ballon devant le front. Garde la poitrine ouverte et le dos droit. Descends seulement aussi bas que tu restes droit."],
+ b_rus:["Rotations assis","assis_v","Assis, buste penché en arrière, pieds au sol. Ballon contre le ventre, tourne le buste d'un côté à l'autre.","Dos long, ne t'affaisse pas. Ce sont les épaules qui tournent, pas seulement les bras. Pieds levés seulement si c'est facile."],
+ b_planche:["Planche","planche","Sur les avant-bras, corps aligné des épaules aux talons. Ventre serré, respire.","Coudes sous les épaules. Ne laisse pas tomber le bassin, ne lève pas les fesses. Sur les genoux si besoin."],
+ b_cote:["Gainage latéral","planche_cote","Sur un avant-bras, de côté, bassin levé. Change de côté à mi-temps.","Coude sous l'épaule, corps aligné. Genou du bas au sol si c'est trop dur. Le bassin ne descend pas.",true],
+ // Tapis de course
+ t_echauf:["Marche d'échauffement","marche","Marche tranquille, à plat. Environ 4 km/h. Relâche les épaules.","Commence doucement. Utilise le clip de sécurité. Bras qui balancent naturellement."],
+ t_rapide:["Marche rapide","marche","Marche vive, à plat ou 1 %. Environ 5,5 à 6 km/h. Tu peux parler mais pas chanter.","Grands pas souples, déroule le pied du talon à la pointe. Ne te tiens pas aux barres sauf en cas de besoin."],
+ t_pente:["Marche en pente","marche_pente","Monte la pente à 6–10 %, vitesse 4,5 à 5 km/h. Buste légèrement penché, pas de main sur les barres.","Augmente la pente quelques secondes avant le début. Pas un peu plus courts, pousse avec les fessiers. Si c'est trop dur, baisse la pente plutôt que la vitesse."],
+ t_retour:["Retour au calme","marche","Pente à 0, vitesse 3,5 à 4 km/h. Laisse le souffle redescendre.","Ralentis progressivement. Respire profondément. Descends du tapis seulement à l'arrêt complet."],
+ // Repos
+ repos:["Repos","debout","Respire profondément et secoue les jambes.",""]};
+
+/* ============ SÉANCES ============ */
+function st(id,d,o){const e=EX[id];o=o||{};return {ex:id,n:o.n||e[0],pose:e[1],c:o.c||e[2],d:d,t:o.t||(id==="repos"?"rest":"calm"),sl:o.sl||"",
+  mid:e[4]?Math.round(d/2):(o.mid||0),mc:e[4]?"Change de côté.":(o.mc||""),breath:!!o.breath}}
+const R5=d=>Math.max(15,Math.round(d/5)*5);
+function scale(list,f){return list.map(s=>({...s,d:R5(s.d*f),mid:s.mid?R5(s.d*f)/2:0}))}
+const SESSIONS=[
+ {id:"reveil",nom:"Réveil mobilité",em:"🌅",c:"#C27C2C",mat:["Aucun matériel"],prep:8,
+  sub:"Réveille les articulations de la tête aux pieds. Mouvements amples, jamais douloureux.",
+  levels:[["Court",1.15],["Normal",1.4],["Long",1.75]],def:0,
+  build:f=>scale([st("m_resp",30),st("m_chev",40),st("m_hanch",40,{mid:20,mc:"Change de sens."}),st("m_epaul",40,{mid:20,mc:"Change de sens."}),
+   st("m_chat",60),st("m_thor",60),st("m_wgs",80),st("m_9090",60),st("m_sqprof",45),st("m_gm",40),st("m_resp",30,{n:"Grand étirement final"})],f)},
+ {id:"soir",nom:"Étirements du soir",em:"🌙",c:"#6B5CA5",mat:["Tapis de sol","Serviette"],prep:8,breath:true,
+  sub:"Positions tenues, respiration lente. Idéal avant de dormir. Étire-toi jusqu'à un tirage doux, jamais une douleur.",
+  levels:[["Court",.75],["Normal",1.1],["Long",1.5]],def:1,
+  build:f=>scale([st("s_resp",60,{breath:true}),st("s_genoux",60,{breath:true}),st("s_ischio",90,{breath:true}),st("s_fig4",90,{breath:true}),
+   st("s_tors",90,{breath:true}),st("s_psoas",90,{breath:true}),st("s_papil",60,{breath:true}),st("s_enfant",75,{breath:true}),
+   st("s_pec",60,{breath:true}),st("s_cou",60,{breath:true}),st("s_resp",45,{breath:true,n:"Respiration finale"})],f)},
+ {id:"ballon",nom:"Mobilité & gainage au ballon",em:"🏐",c:"#B8612E",mat:["Ballon 4 kg","Tapis de sol"],prep:10,
+  sub:"Épaules et buste plus mobiles, ventre plus solide. 40 s d'effort, 20 s de repos.",
+  levels:[["1 tour",1],["2 tours",2],["3 tours",3]],def:1,
+  build:n=>{const a=[st("m_epaul",40,{mid:20,mc:"Change de sens.",sl:"Échauffement"}),st("m_chat",50,{sl:"Échauffement"})];
+   for(let i=1;i<=n;i++){const sl="Tour "+i+" sur "+n;
+    for(const [id,d,mc] of [["b_halo",40,"Change de sens."],["b_buch",40],["b_squat",40],["b_rus",40],["b_planche",30],["b_cote",40]]){
+     a.push(st(id,d,{t:"work",sl,mid:mc?20:0,mc}));a.push(st("repos",20,{c:"Pose le ballon, respire."}))}}
+   a.pop();a.push(st("s_pec",60,{sl:"Retour au calme"}),st("s_enfant",60,{sl:"Retour au calme",breath:true}),st("s_tors",60,{sl:"Retour au calme",breath:true}));return a}},
+ {id:"tapis",nom:"Marche active sur tapis",em:"🚶",c:"#4F7A3D",mat:["Tapis de course"],prep:10,
+  sub:"Cardio doux en alternant marche rapide et marche en pente, puis étirements des jambes. Clip de sécurité attaché.",
+  levels:[["3 blocs",3],["5 blocs",5],["6 blocs",6]],def:1,
+  build:n=>{const a=[st("t_echauf",240)];for(let i=1;i<=n;i++){const sl="Bloc "+i+" sur "+n;a.push(st("t_rapide",120,{t:"work",sl}),st("t_pente",60,{t:"work",sl}))}
+   a.push(st("t_retour",180),st("st_mollet",90),st("st_quad",90),st("s_psoas",90,{c:"Descends du tapis. Genou arrière au sol (coussin), avance doucement le bassin."}));return a}},
+ {id:"complete",nom:"Séance complète express",em:"⚡",c:"#1F6E8C",mat:["Gilet 10 kg","Gilet 4 kg","2 poids de 10 kg","Tapis de sol"],prep:10,
+  sub:"Mobilité, squat et soulevé de terre, étirements : tout le corps en une séance.",
+  levels:[["2 séries",2],["3 séries",3],["4 séries",4]],def:1,
+  build:n=>{const a=[st("m_chat",50,{sl:"Mobilité"}),st("m_wgs",80,{sl:"Mobilité"}),st("m_hanch",40,{sl:"Mobilité",mid:20,mc:"Change de sens."}),st("m_sqprof",45,{sl:"Mobilité"}),st("m_thor",60,{sl:"Mobilité"})];
+   for(let i=1;i<=n;i++){a.push(st("sq_gob",45,{t:"work",sl:"Série "+i+" sur "+n}));a.push(st("repos",60,{c:i<n?"Respire profondément et secoue les jambes.":"Pose le poids du squat. Prends les 2 poids de 10 kg et mets le gilet de 4 kg."}))}
+   for(let i=1;i<=n;i++){a.push(st("sq_dl",45,{t:"work",sl:"Série "+i+" sur "+n}));a.push(st("repos",60,{c:i<n?"Respire, secoue les bras et les jambes.":"Pose les poids et retire le gilet. Bois un peu d'eau."}))}
+   a.push(st("st_ischio",60),st("s_psoas",60),st("s_pec",60),st("s_enfant",60,{breath:true}));return a}},
+ {id:"sq",nom:"Squat et soulevé",em:"🏋️",c:"#2447A8",mat:["Gilet 10 kg","Gilet 4 kg","2 poids de 10 kg"],prep:10,
+  sub:"Dos plat, ventre serré, mouvements lents.",levels:[["Normal",1]],def:0,
+  rules:'<details><summary>Les règles d\'or</summary><ul><li>Le dos reste plat comme une table, jamais rond.</li><li>Ventre serré avant chaque répétition.</li><li>Regard droit devant, menton légèrement rentré.</li><li>Une douleur vive au dos ou au genou : tu t\'arrêtes. Un muscle qui brûle, c\'est normal.</li></ul></details>',
+  build:()=>{const a=[st("sq_poids",90,{sl:"Échauffement"}),st("sq_charn",90,{sl:"Échauffement"})];
+   for(let i=1;i<=4;i++){a.push(st("sq_gob",45,{t:"work",sl:"Série "+i+" sur 4"}));a.push(st("repos",60,{c:i<4?"Respire profondément et secoue les jambes.":"Pose le poids du squat. Prends les 2 poids de 10 kg et mets le gilet de 4 kg."}))}
+   for(let i=1;i<=4;i++){a.push(st("sq_dl",45,{t:"work",sl:"Série "+i+" sur 4"}));a.push(st("repos",60,{c:i<4?"Respire profondément, secoue les bras et les jambes.":"Pose les poids et retire le gilet. Bois un peu d'eau."}))}
+   a.push(st("st_ischio",90,{sl:"Retour au calme"}),st("st_quad",90,{sl:"Retour au calme"}));return a}},
+ {id:"tc",nom:"Tai Chi",em:"🌿",c:"#2F7561",mat:["Aucun matériel"],prep:5,breath:true,calm:true,
+  sub:"Lent comme dans du miel. Genoux souples, épaules lourdes.",levels:[["7 min",1]],def:0,
+  rules:'<details><summary>Les 3 règles d\'or</summary><ul><li>Genoux souples, jamais tendus.</li><li>Épaules lourdes, comme un manteau mouillé.</li><li>Le poids passe d\'une jambe à l\'autre comme de l\'eau. Respire par le nez.</li></ul></details><details><summary>Conseils</summary><p>Semaine 1 : 2 mouvements par jour suffisent. Dès la semaine 2 : les 6 d\'affilée. Si tes genoux gênent, plie moins les jambes.</p></details>',
+  build:()=>[["tc_arbre",45],["tc_ouv",60],["tc_nuages",90],["tc_pousser",90],["tc_ballon",60],["tc_ferm",75]].map(([id,d],k)=>{const s=st(id,d,{breath:true,sl:"Mouvement "+(k+1)+" sur 6"});if(id==="tc_pousser"){s.mc="Change de jambe : pied opposé devant, 6 nouvelles poussées."}return s})}
+];
+const SBY=Object.fromEntries(SESSIONS.map(s=>[s.id,s]));
+const minutes=steps=>Math.round(steps.reduce((t,s)=>t+s.d,0)/60);
+function levelSteps(s,li){return s.build(s.levels[li][1])}
+
+/* ============ PROFILS & STOCKAGE ============ */
+const JOURS=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const ORDRE=[1,2,3,4,5,6,0];
+const WEEK_DEF={1:"reveil",2:"sq",3:"tapis",4:"ballon",5:"complete",6:"tc",0:"soir"};
+let DB;
+function blankUser(id,name){return {id,name,hist:[],week:{...WEEK_DEF},lvl:{}}}
+function load(){try{DB=JSON.parse(localStorage.getItem("ent_v2")||"null")}catch(e){DB=null}
+ if(!DB||!DB.users){DB={users:[blankUser("u1","Moi"),blankUser("u2","Utilisateur 2")],cur:"u1",sound:true,voice:true}}}
+function save(){try{localStorage.setItem("ent_v2",JSON.stringify(DB))}catch(e){}}
+load();
+const U=()=>DB.users.find(u=>u.id===DB.cur)||DB.users[0];
+const dkey=d=>{const z=new Date(d);return z.getFullYear()+"-"+String(z.getMonth()+1).padStart(2,"0")+"-"+String(z.getDate()).padStart(2,"0")};
+function streak(u){const days=new Set(u.hist.map(h=>h.d));let n=0,d=new Date();if(!days.has(dkey(d)))d.setDate(d.getDate()-1);
+ while(days.has(dkey(d))){n++;d.setDate(d.getDate()-1)}return n}
+function weekStats(u){const d=new Date();const off=(d.getDay()+6)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-off);
+ const h=u.hist.filter(x=>x.t>=d.getTime());return {n:h.length,min:h.reduce((t,x)=>t+(x.min||0),0)}}
+
+/* ============ NAVIGATION (bouton retour du téléphone) ============ */
+let view={v:"home"};
+function go(v,replace){stopTimer();view=v;try{history[replace?"replaceState":"pushState"](v,"")}catch(e){}draw();window.scrollTo(0,0)}
+window.addEventListener("popstate",e=>{stopTimer();view=e.state||{v:"home"};draw();window.scrollTo(0,0)});
+const $=x=>document.getElementById(x);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600)}
+function setColor(c){document.documentElement.style.setProperty("--work",c||"var(--main)");document.querySelector('meta[name="theme-color"]').setAttribute("content",c||"#2447A8")}
+
+function draw(){
+ const app=$("app");
+ if(view.v==="sess"&&SBY[view.id]) return drawSession(app,SBY[view.id]);
+ setColor(null);
+ if(view.v==="week") return drawWeek(app);
+ if(view.v==="hist") return drawHist(app);
+ if(view.v==="users") return drawUsers(app);
+ drawHome(app);
+}
+function userChips(){return `<div class="users">${DB.users.map(u=>`<button data-user="${u.id}" class="${u.id===DB.cur?"on":""}">👤 ${esc(u.name)}</button>`).join("")}<button data-nav="users" aria-label="Renommer les profils">✏️</button></div>`}
+function doneToday(u,id){const k=dkey(Date.now());return u.hist.some(h=>h.d===k&&(!id||h.s===id))}
+function drawHome(app){
+ const u=U(),today=new Date().getDay(),sid=u.week[today],s=SBY[sid],ws=weekStats(u),sk=streak(u);
+ let h=`<h1>Mon entraînement</h1>${userChips()}`;
+ if(s){const li=u.lvl[s.id]??s.def,m=minutes(levelSteps(s,li));
+  h+=`<div class="today" style="--c:${s.c}"><div class="lbl">Aujourd'hui · ${JOURS[today]}</div><div class="big">${s.em} ${esc(s.nom)}</div>
+  <div class="sub" style="margin:0">${m} min · ${s.mat.join(", ")}</div>${doneToday(u,s.id)?`<p style="margin:8px 0 0;color:${s.c};font-weight:700">✓ Faite aujourd'hui, bravo !</p>`:`<button data-sess="${s.id}">Commencer</button>`}</div>`}
+ else h+=`<div class="today"><div class="lbl">Aujourd'hui · ${JOURS[today]}</div><div class="big">😌 Jour de repos</div><div class="sub" style="margin:0">Envie de bouger quand même ? Choisis une séance ci-dessous.</div></div>`;
+ h+=`<div class="stats"><div class="stat"><b>${sk?"🔥 "+sk:"0"}</b><span>jour${sk>1?"s":""} d'affilée</span></div><div class="stat"><b>${ws.n}</b><span>séance${ws.n>1?"s":""} cette semaine</span></div><div class="stat"><b>${ws.min}</b><span>minutes cette semaine</span></div></div>
+ <div class="row"><button data-nav="week">📅 Ma semaine</button><button data-nav="hist">📈 Historique</button></div>
+ <h3>Toutes les séances</h3>`;
+ for(const s of SESSIONS){const ms=s.levels.map((l,i)=>minutes(levelSteps(s,i))),r=ms.length>1?ms[0]+"–"+ms[ms.length-1]:ms[0];
+  h+=`<button class="card" data-sess="${s.id}" style="--c:${s.c}"><span class="em">${s.em}</span><div><b>${esc(s.nom)}</b><span>${r} min · ${s.mat.join(", ")}</span></div>${doneToday(u,s.id)?`<span class="done">✓ aujourd'hui</span>`:""}</button>`}
+ h+=`<div class="row" style="margin-top:14px"><button id="snd">${DB.sound?"🔔 Bips : oui":"🔕 Bips : non"}</button><button id="vox">${DB.voice?"🗣️ Voix : oui":"🤐 Voix : non"}</button></div>`;
+ app.innerHTML=h;
+ $("snd").onclick=()=>{DB.sound=!DB.sound;save();draw()};
+ $("vox").onclick=()=>{DB.voice=!DB.voice;save();draw();if(DB.voice)say("La voix est activée.")};
+}
+function drawWeek(app){
+ const u=U();let h=`<button class="back" data-back>← Retour</button><h2>📅 Ma semaine</h2><p class="sub">Semaine type de <b>${esc(u.name)}</b>. La séance du jour s'affiche sur l'accueil.</p>`;
+ for(const d of ORDRE){h+=`<label class="wk"><b style="text-transform:capitalize">${JOURS[d]}</b><select data-day="${d}"><option value="">😌 Repos</option>${SESSIONS.map(s=>`<option value="${s.id}" ${u.week[d]===s.id?"selected":""}>${s.em} ${esc(s.nom)}</option>`).join("")}</select></label>`}
+ h+=`<p class="sub">Conseil : alterne les jours de renforcement (squat, séance complète) avec des jours plus doux (mobilité, marche, étirements).</p>`;
+ app.innerHTML=h;
+ app.querySelectorAll("select[data-day]").forEach(sel=>sel.onchange=()=>{u.week[sel.dataset.day]=sel.value;save();toast("Semaine enregistrée")});
+}
+function drawHist(app){
+ const u=U(),list=[...u.hist].sort((a,b)=>b.t-a.t);
+ const m=new Date();m.setDate(1);m.setHours(0,0,0,0);const mo=u.hist.filter(x=>x.t>=m.getTime());
+ let h=`<button class="back" data-back>← Retour</button><h2>📈 Historique</h2><p class="sub">Séances de <b>${esc(u.name)}</b></p>
+ <div class="stats"><div class="stat"><b>${streak(u)}</b><span>jours d'affilée</span></div><div class="stat"><b>${mo.length}</b><span>séances ce mois</span></div><div class="stat"><b>${mo.reduce((t,x)=>t+(x.min||0),0)}</b><span>minutes ce mois</span></div></div>`;
+ if(!list.length)h+=`<div class="empty">Aucune séance pour l'instant.<br>Elles s'enregistrent toutes seules quand tu arrives au bout.</div>`;
+ let last="";
+ for(const x of list.slice(0,120)){const s=SBY[x.s]||{nom:x.s,em:"•",c:"var(--main)"};
+  if(x.d!==last){last=x.d;const dt=new Date(x.t);h+=`<div class="hday">${JOURS[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}</div>`}
+  h+=`<div class="hitem" style="--c:${s.c}"><div>${s.em} <b>${esc(s.nom)}</b><br><span>${x.min} min · ${new Date(x.t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}</span></div><button data-delh="${x.t}" aria-label="Supprimer">✕</button></div>`}
+ app.innerHTML=h;
+}
+function drawUsers(app){
+ let h=`<button class="back" data-back>← Retour</button><h2>👤 Profils</h2><p class="sub">Chaque profil a son historique, sa semaine type et ses durées préférées.</p>`;
+ DB.users.forEach((u,i)=>{h+=`<label class="wk"><b>Profil ${i+1}</b><input type="text" maxlength="20" data-uname="${u.id}" value="${esc(u.name)}"></label>`});
+ h+=`<button class="save" id="svu">Enregistrer</button>`;
+ app.innerHTML=h;
+ $("svu").onclick=()=>{app.querySelectorAll("[data-uname]").forEach(i=>{const u=DB.users.find(x=>x.id===i.dataset.uname);if(u)u.name=i.value.trim()||u.name});save();toast("Profils enregistrés");history.back()};
+}
+
+/* ============ SÉANCE / MINUTEUR ============ */
+let CUR=null,S=[],starts=[],TOTAL=0,PREP=0,el=0,run=false,last=0,idx=-2,sec=-1,midDone=-1,recorded=false,ctx=null,wl=null,poseKey="";
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function fmt(t){t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+":"+("0"+t%60).slice(-2)}
+function beep(f,d){if(!DB.sound||!ctx)return;try{const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;o.type="sine";o.frequency.value=f;o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function say(t){if(!DB.voice||!window.speechSynthesis)return;try{speechSynthesis.cancel();const v=new SpeechSynthesisUtterance(t);v.lang="fr-FR";v.rate=1;const fr=speechSynthesis.getVoices().find(x=>/^fr/i.test(x.lang));if(fr)v.voice=fr;speechSynthesis.speak(v)}catch(e){}}
+function lock(on){try{if(on&&navigator.wakeLock){navigator.wakeLock.request("screen").then(l=>{wl=l}).catch(()=>{})}else if(wl){wl.release();wl=null}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&run)lock(true)});
+function stepAt(t){let r=0;for(let k=0;k<S.length;k++){if(t>=starts[k])r=k}return r}
+function stopTimer(){if(run){run=false;lock(false)}try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}}
+function setup(s,li){CUR=s;S=levelSteps(s,li);PREP=s.prep;TOTAL=0;starts=[];S.forEach(x=>{starts.push(TOTAL);TOTAL+=x.d});el=-PREP;idx=-2;sec=-1;midDone=-1;recorded=false;run=false;poseKey=""}
+function drawSession(app,s){
+ const u=U(),li=Math.min(u.lvl[s.id]??s.def,s.levels.length-1);setColor(s.c);setup(s,li);
+ const uniq=[...new Set(S.map(x=>x.ex))].filter(x=>x!=="repos");
+ let h=`<button class="back" data-back>← Séances</button><h2>${s.em} ${esc(s.nom)}</h2><p class="sub">${esc(s.sub)}</p>
+ <div class="chips">${s.mat.map(m=>`<span class="chip">${esc(m)}</span>`).join("")}<span class="chip">👤 ${esc(u.name)}</span></div>`;
+ if(s.levels.length>1)h+=`<div class="lv">${s.levels.map((l,i)=>`<button data-lvl="${i}" aria-pressed="${i===li}">${l[0]}<br><small>${minutes(levelSteps(s,i))} min</small></button>`).join("")}</div>`;
+ h+=`<section class="now" id="now" aria-live="polite"><div class="phase" id="phase"></div><div class="tline"><div class="time" id="time"></div><div class="pose" id="pose" style="color:var(--work)"></div></div>
+ <div class="bar"><i id="fill"></i></div><div class="br" id="br" hidden><span class="dot" id="dot"></span><span id="bt"></span></div>
+ <h2 id="name"></h2><div class="sl" id="sl"></div><p id="cue"></p><p class="mid" id="midc"></p><p class="next" id="next"></p></section>
+ <div class="btns"><button id="go">Démarrer</button><button id="skip">Passer</button><button id="reset">Recommencer</button></div>
+ <p class="tot" id="tot"></p>
+ <details><summary>Au programme (${S.length} étapes)</summary><ol class="plan">${S.map(x=>`<li>${esc(x.n)} <span>· ${fmt(x.d)}${x.sl?" · "+esc(x.sl):""}</span></li>`).join("")}</ol></details>
+ <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" style="width:72px;height:72px;color:var(--work)">${poseSVG(EX[id][1])}</div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
+ app.innerHTML=h;
+ $("go").onclick=toggle;
+ $("skip").onclick=()=>{if(el<0)el=0;else if(el<TOTAL){const k=stepAt(el);el=S[k+1]?starts[k+1]:TOTAL}last=performance.now();if(el>=TOTAL)finish();render()};
+ $("reset").onclick=()=>{stopTimer();setup(s,li);render()};
+ app.querySelectorAll("[data-lvl]").forEach(b=>b.onclick=()=>{u.lvl[s.id]=+b.dataset.lvl;save();stopTimer();drawSession(app,s)});
  render();
 }
+function toggle(){try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();if(ctx.resume)ctx.resume()}catch(e){}
+ if(el>=TOTAL){el=-PREP;idx=-2;midDone=-1;recorded=false}
+ run=!run;last=performance.now();lock(run);
+ if(run&&el<=-PREP+0.2)say("Prépare-toi. On commence par : "+S[0].n);
+ render()}
+function finish(){el=TOTAL;run=false;lock(false);beep(523,1.4);say("Séance terminée. Bravo !");
+ if(!recorded){recorded=true;const u=U(),done=Math.max(1,minutes(S));u.hist.push({t:Date.now(),d:dkey(Date.now()),s:CUR.id,min:done});save();toast("✓ Séance enregistrée pour "+u.name)}}
 function render(){
- var cls="",rem,dur,k,s,p;
- if(el<0){rem=-el;dur=PREP;$("phase").textContent="Prépare-toi";$("name").textContent="Place-toi";$("sl").textContent="";$("cue").textContent=P[prog].pc;$("next").textContent="Ensuite : "+S[0].n;}
- else if(el>=TOTAL){cls="calm";rem=0;dur=1;$("phase").textContent="Terminé";$("name").textContent="Bravo";$("sl").textContent="";$("cue").textContent="Même heure demain : c’est la régularité qui compte. Bois un peu d’eau.";$("next").textContent="";}
- else{k=stepAt(el);s=S[k];cls=s.t;rem=starts[k]+s.d-el;dur=s.d;
-  $("phase").textContent=s.t==="work"?"Travail":(s.t==="rest"?"Repos":s.sl);
-  $("name").textContent=s.n;$("sl").textContent=s.t==="work"?s.sl:"";
-  $("cue").textContent=(s.mid&&el-starts[k]>=s.mid)?s.mc:s.c;
-  $("next").textContent=S[k+1]?"Ensuite : "+S[k+1].n+(S[k+1].t==="work"?", "+S[k+1].sl.toLowerCase():""):"";}
- var br=$("br");
- if(P[prog].tip&&el>=0&&el<TOTAL){p=((el%8)+8)%8;br.hidden=false;$("bt").textContent=p<4?"Inspire":"Expire";$("dot").style.transform=reduce?"none":"scale("+(.65+.65*(1-Math.cos(2*Math.PI*p/8))/2)+")";}
- else br.hidden=true;
+ if(view.v!=="sess"||!$("now"))return;
+ let cls="",rem,dur,k,s,pk;
+ if(el<0){rem=-el;dur=PREP;$("phase").textContent="Prépare-toi";$("name").textContent="Place-toi";$("sl").textContent="";$("cue").textContent="Ensuite : "+S[0].n+". "+S[0].c;$("midc").textContent="";$("next").textContent="";pk=S[0].pose}
+ else if(el>=TOTAL){cls="calm";rem=0;dur=1;$("phase").textContent="Terminé";$("name").textContent="Bravo 🎉";$("sl").textContent="";$("cue").textContent="Bois un peu d'eau. C'est la régularité qui compte.";$("midc").textContent="";$("next").textContent="";pk="bras_haut"}
+ else{k=stepAt(el);s=S[k];cls=s.t;rem=starts[k]+s.d-el;dur=s.d;pk=s.pose;
+  $("phase").textContent=s.t==="work"?"Effort":(s.t==="rest"?"Repos":(s.sl||"En douceur"));
+  $("name").textContent=s.n;$("sl").textContent=s.t==="work"?s.sl:"";$("cue").textContent=s.c;
+  $("midc").textContent=(s.mid&&el-starts[k]>=s.mid)?s.mc:"";
+  $("next").textContent=S[k+1]?"Ensuite : "+S[k+1].n+(S[k+1].t==="work"&&S[k+1].sl?", "+S[k+1].sl.toLowerCase():""):""}
+ if(pk!==poseKey){poseKey=pk;$("pose").innerHTML=poseSVG(pk)}
+ const br=$("br");
+ if(s&&s.breath&&el>=0&&el<TOTAL){const p=((el%8)+8)%8;br.hidden=false;$("bt").textContent=p<4?"Inspire":"Expire";$("dot").style.transform=reduce?"none":"scale("+(.65+.65*(1-Math.cos(2*Math.PI*p/8))/2)+")"}else br.hidden=true;
  $("now").className="now "+cls;$("time").textContent=fmt(rem);$("fill").style.width=(100*(1-rem/dur))+"%";
- $("tot").textContent=el<0?"Séance de "+Math.round(TOTAL/60)+" minutes":"Reste "+fmt(TOTAL-Math.max(0,el))+" sur la séance";
+ $("tot").textContent=el<0?"Séance de "+Math.round(TOTAL/60)+" minutes":(el>=TOTAL?"Séance terminée":"Reste "+fmt(TOTAL-Math.max(0,el))+" sur la séance");
  $("go").textContent=el>=TOTAL?"Refaire":(run?"Pause":(el>-PREP?"Reprendre":"Démarrer"));
 }
 function tick(){
- if(!run)return;
- var n=performance.now(),k,r;el+=(n-last)/1000;last=n;
- if(el>=TOTAL){el=TOTAL;run=false;lock(false);beep(523,1.4);}
+ if(!run||view.v!=="sess")return;
+ const n=performance.now();el+=(n-last)/1000;last=n;
+ if(el>=TOTAL){finish()}
  else{
-  if(el>=0){k=stepAt(el);if(k!==idx){beep(S[k].t==="work"?700:(S[k].t==="rest"?440:560),.6);idx=k;}}
-  if(!P[prog].tip){r=Math.ceil(el<0?-el:starts[stepAt(el)]+S[stepAt(el)].d-el);if(r!==sec){sec=r;if(r>=1&&r<=3)beep(880,.12);}}
+  if(el>=0){const k=stepAt(el),s=S[k];
+   if(k!==idx){idx=k;beep(s.t==="work"?700:(s.t==="rest"?440:560),.6);midDone=-1;say(s.n+(s.t==="work"&&s.sl?", "+s.sl:""))}
+   if(s.mid&&midDone!==k&&el-starts[k]>=s.mid){midDone=k;beep(660,.3);say(s.mc)}}
+  if(!CUR.calm){const k=stepAt(el),r=Math.ceil(el<0?-el:starts[k]+S[k].d-el);if(r!==sec){sec=r;if(r>=1&&r<=3)beep(880,.12)}}
  }
  render();
 }
-$("go").onclick=function(){
- try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();if(ctx.resume)ctx.resume();}catch(e){}
- if(el>=TOTAL){el=-PREP;idx=-2;}
- run=!run;last=performance.now();lock(run);render();
-};
-$("skip").onclick=function(){if(el<0){el=0;}else if(el<TOTAL){var k=stepAt(el);el=S[k+1]?starts[k+1]:TOTAL;}last=performance.now();render();};
-$("reset").onclick=function(){setProg(prog);};
-$("t-tc").onclick=function(){setProg("tc");};
-$("t-sq").onclick=function(){setProg("sq");};
-$("snd").onclick=function(){sound=!sound;this.textContent="Son : "+(sound?"oui":"non");this.setAttribute("aria-pressed",String(sound));};
-var saved=null;try{saved=localStorage.getItem("prog");}catch(e){}
-setProg(saved==="sq"?"sq":"tc");
 setInterval(tick,100);
+
+/* ============ ÉVÉNEMENTS ============ */
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-sess],[data-nav],[data-user],[data-back],[data-delh]");if(!t)return;
+ if(t.dataset.sess)go({v:"sess",id:t.dataset.sess});
+ else if(t.dataset.nav)go({v:t.dataset.nav});
+ else if(t.dataset.user){DB.cur=t.dataset.user;save();draw();toast("Profil : "+U().name)}
+ else if(t.hasAttribute("data-back")){if(history.state&&history.state.v!=="home"&&history.length>1)history.back();else go({v:"home"},true)}
+ else if(t.dataset.delh){const u=U();u.hist=u.hist.filter(h=>String(h.t)!==t.dataset.delh);save();draw();toast("Séance supprimée")}
+});
+try{history.replaceState({v:"home"},"")}catch(e){}
+draw();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
-<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script>
 </body>
 </html>
