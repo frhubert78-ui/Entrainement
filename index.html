@@ -304,16 +304,16 @@ const SESSIONS=[
     if(i<n)a.push(st("dx_echange",45,{t:"rest",sl:"Au tour de "+hold+" de frapper"}))}
    a.push(st("bx_av",60,{sl:"Retour au calme"}),st("s_pec",60,{sl:"Retour au calme"}));return a}},
  {id:"sq",nom:"Squat et soulevé",em:"🏋️",c:"#2447A8",mat:["Gilet 10 kg","Gilet 4 kg","2 poids de 10 kg"],prep:10,
-  sub:"Dos plat, ventre serré, mouvements lents.",levels:[["Normal",1]],def:0,
+  sub:"Dos plat, ventre serré, mouvements lents.",levels:[["Court",3],["Normal",4],["Long",5]],def:1,
   rules:'<details><summary>Les règles d\'or</summary><ul><li>Le dos reste plat comme une table, jamais rond.</li><li>Ventre serré avant chaque répétition.</li><li>Regard droit devant, menton légèrement rentré.</li><li>Une douleur vive au dos ou au genou : tu t\'arrêtes. Un muscle qui brûle, c\'est normal.</li></ul></details>',
-  build:()=>{const a=[st("sq_poids",90,{sl:"Échauffement"}),st("sq_charn",90,{sl:"Échauffement"})];
-   for(let i=1;i<=4;i++){a.push(st("sq_gob",45,{t:"work",sl:"Série "+i+" sur 4"}));a.push(st("repos",60,{c:i<4?"Respire profondément et secoue les jambes.":"Pose le poids du squat. Prends les 2 poids de 10 kg et mets le gilet de 4 kg."}))}
-   for(let i=1;i<=4;i++){a.push(st("sq_dl",45,{t:"work",sl:"Série "+i+" sur 4"}));a.push(st("repos",60,{c:i<4?"Respire profondément, secoue les bras et les jambes.":"Pose les poids et retire le gilet. Bois un peu d'eau."}))}
+  build:n=>{const a=[st("sq_poids",90,{sl:"Échauffement"}),st("sq_charn",90,{sl:"Échauffement"})];
+   for(let i=1;i<=n;i++){a.push(st("sq_gob",45,{t:"work",sl:"Série "+i+" sur "+n}));a.push(st("repos",60,{c:i<n?"Respire profondément et secoue les jambes.":"Pose le poids du squat. Prends les 2 poids de 10 kg et mets le gilet de 4 kg."}))}
+   for(let i=1;i<=n;i++){a.push(st("sq_dl",45,{t:"work",sl:"Série "+i+" sur "+n}));a.push(st("repos",60,{c:i<n?"Respire profondément, secoue les bras et les jambes.":"Pose les poids et retire le gilet. Bois un peu d'eau."}))}
    a.push(st("st_ischio",90,{sl:"Retour au calme"}),st("st_quad",90,{sl:"Retour au calme"}));return a}},
  {id:"tc",nom:"Tai Chi",em:"🌿",c:"#2F7561",mat:["Aucun matériel"],prep:5,breath:true,calm:true,
-  sub:"Lent comme dans du miel. Genoux souples, épaules lourdes.",levels:[["7 min",1]],def:0,
+  sub:"Lent comme dans du miel. Genoux souples, épaules lourdes.",levels:[["Court",1],["Normal",1.5],["Long",2.1]],def:0,
   rules:'<details><summary>Les 3 règles d\'or</summary><ul><li>Genoux souples, jamais tendus.</li><li>Épaules lourdes, comme un manteau mouillé.</li><li>Le poids passe d\'une jambe à l\'autre comme de l\'eau. Respire par le nez.</li></ul></details><details><summary>Conseils</summary><p>Semaine 1 : 2 mouvements par jour suffisent. Dès la semaine 2 : les 6 d\'affilée. Si tes genoux gênent, plie moins les jambes.</p></details>',
-  build:()=>[["tc_arbre",45],["tc_ouv",60],["tc_nuages",90],["tc_pousser",90],["tc_ballon",60],["tc_ferm",75]].map(([id,d],k)=>{const s=st(id,d,{breath:true,sl:"Mouvement "+(k+1)+" sur 6"});if(id==="tc_pousser"){s.mc="Change de jambe : pied opposé devant, 6 nouvelles poussées."}return s})}
+  build:f=>scale([["tc_arbre",45],["tc_ouv",60],["tc_nuages",90],["tc_pousser",90],["tc_ballon",60],["tc_ferm",75]].map(([id,d],k)=>{const s=st(id,d,{breath:true,sl:"Mouvement "+(k+1)+" sur 6"});if(id==="tc_pousser"){s.mc="Change de jambe : pied opposé devant, nouvelles poussées."}return s}),f)}
 ];
 const SBY=Object.fromEntries(SESSIONS.map(s=>[s.id,s]));
 const minutes=steps=>Math.round(steps.reduce((t,s)=>t+s.d,0)/60);
