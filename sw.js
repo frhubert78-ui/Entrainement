@@ -1,7 +1,7 @@
 // Service worker – Mon entraînement
 const PREFIX = "entrainement-";
-const CACHE = PREFIX + "v2";
-const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
+const CACHE = PREFIX + "v3";
+const SHELL = ["./", "./index.html", "./fond.jpg", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
@@ -14,7 +14,7 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(res => {
-      const copy = res.clone(); caches.open(CACHE).then(c => c.put("./index.html", copy)); return res;
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put("./index.html", "./fond.jpg", copy)); return res;
     }).catch(() => caches.match("./index.html")));
     return;
   }

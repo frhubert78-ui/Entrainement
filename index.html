@@ -92,9 +92,18 @@ select,input[type=text]{font:inherit;flex:1;min-height:44px;border-radius:10px;b
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.92rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.dot{transition:none}}
+/* fond d'écran */
+html{background:var(--bg)}body{background:transparent}
+.bgimg{position:fixed;inset:0;z-index:-2;background:url(fond.jpg) center/cover no-repeat}
+.bgveil{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(238,240,243,.66),rgba(238,240,243,.45))}
+@media (prefers-color-scheme:dark){.bgveil{background:linear-gradient(180deg,rgba(18,23,29,.72),rgba(18,23,29,.55))}}
+.now{background:color-mix(in srgb,var(--card) 82%,transparent);border-radius:0 0 16px 16px;padding:10px 14px 14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.card,.today,.stat,.wk,.hitem,.row button,.lv button:not([aria-pressed="true"]),.users button:not(.on),.btns button:not(#go){background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+details{background:color-mix(in srgb,var(--card) 70%,transparent);padding:8px 12px;border-radius:10px;margin-bottom:6px;border:0!important}
 </style>
 </head>
 <body>
+<div class="bgimg"></div><div class="bgveil"></div>
 <main id="app"></main>
 <div class="toast" id="toast"></div>
 <script>
