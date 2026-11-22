@@ -58,7 +58,7 @@ button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visi
 .phase{color:var(--cur);font-size:1.25rem;font-weight:700}
 .tline{display:flex;align-items:center;gap:12px}
 .time{font-size:5.6rem;font-weight:700;line-height:1;margin:2px 0 8px;flex:1}
-.pose{width:104px;height:104px;flex:none;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.pose{width:120px;height:120px;flex:none;border-radius:14px;background:radial-gradient(ellipse at 50% 30%,#1f2833,#0b0e12 75%);border:1px solid #262e38;overflow:hidden}
 .pose svg{width:100%;height:100%}
 .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--cur)}
@@ -256,7 +256,76 @@ function frameAt(id,now){
 }
 const reduceMotion=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 function poseSVG(k){return fig(poseArr(k))}
-function animEx(el,now){const id=el.dataset.ex;if(id)el.innerHTML=fig(frameAt(id,now),PROPX[id])}
+/* ===== Silhouette anatomique : muscles travaillés en vert ===== */
+const GL="#a6ff3d";
+const MUSC={
+ tc_arbre:["abdo:1-2F,quad:2-9F,quad:2-7F",[.4,.6]],tc_ouv:["delt:1-5F,delt:1-3F,quad:2-9F,quad:2-7F",[.4,.9]],tc_nuages:["obl:1-2F,delt:1-5F,delt:1-3F",[.5,.8]],
+ tc_pousser:["quad:2-9F,delt:1-5F,tri:1-5B",[.3,1]],tc_ballon:["delt:1-5F,pec:1-2F",[.4,.8]],tc_ferm:["abdo:1-2F",[.4,.7]],
+ sq_poids:["quad:2-9F,quad:2-7F,fess:2-9B,fess:2-7B",[.15,1]],sq_charn:["ischio:2-9B,ischio:2-7B,fess:2-9B,lomb:1-2B",[.2,1]],
+ sq_gob:["quad:2-9F,quad:2-7F,fess:2-9B,fess:2-7B",[.15,1]],sq_dl:["ischio:2-9B,ischio:2-7B,fess:2-9B,lomb:1-2B",[.25,1]],
+ m_resp:["delt:1-5F,abdo:1-2F",[.3,.8]],m_chev:["mollet:9-10B",[.5,.9]],m_hanch:["fess:2-9B,obl:1-2F,lomb:1-2B",[.5,.8,.5,.8]],
+ m_epaul:["delt:1-5F,delt:1-3F",[.4,.9]],m_chat:["lomb:1-2B,abdo:1-2F,dos:1-2B",[.6,1]],m_thor:["dos:1-2B,obl:1-2F",[.4,1]],
+ m_wgs:["psoas:1-2F,quad:2-7F,obl:1-2F",[.5,1]],m_9090:["fess:2-9B,fess:2-7B",[.5,1]],m_sqprof:["fess:2-9B,quad:2-9F,mollet:9-10B",[.7,.9]],
+ m_gm:["ischio:2-9B,ischio:2-7B,lomb:1-2B",[.2,1]],s_resp:["abdo:1-2F",[.3,.8]],s_genoux:["lomb:1-2B,fess:2-9B",[.5,.9]],
+ s_ischio:["ischio:2-9B",[.4,1]],s_fig4:["fess:2-9B,fess:2-7B",[.5,1]],s_tors:["obl:1-2F,lomb:1-2B,pec:1-2F",[.4,1]],
+ s_psoas:["quad:2-7F,psoas:1-2F",[.45,1]],s_papil:["quad:2-9F,quad:2-7F",[.5,.9]],s_enfant:["lomb:1-2B,dos:1-2B",[.5,.9]],
+ s_pec:["pec:1-2F,delt:1-3F",[.5,1]],s_cou:["dos:1-2B",[.4,.9]],st_ischio:["ischio:2-9B",[.3,1]],st_quad:["quad:2-9F",[.3,1]],
+ st_mollet:["mollet:7-8B",[.4,1]],b_halo:["delt:1-5F,delt:1-3F,abdo:1-2F",[.6,.9,.6]],b_buch:["obl:1-2F,delt:1-5F,fess:2-9B",[.4,1]],
+ b_squat:["quad:2-9F,quad:2-7F,fess:2-9B,delt:1-5F",[.3,1]],b_rus:["obl:1-2F,abdo:1-2F",[.6,1]],b_planche:["abdo:1-2F,delt:1-5F",[.85,1]],
+ b_cote:["obl:1-2F",[1]],t_echauf:["quad:2-9F,mollet:9-10B,ischio:2-7B",[.5,.6]],t_rapide:["quad:2-9F,mollet:9-10B,ischio:2-7B",[.7,.85]],
+ t_pente:["fess:2-9B,fess:2-7B,mollet:9-10B,quad:2-9F",[.8,1]],t_retour:["quad:2-9F,mollet:9-10B",[.3,.4]],
+ bx_saut:["mollet:9-10B,mollet:7-8B,quad:2-9F",[.4,.9]],bx_echauf:["delt:1-5F,delt:1-3F,avb:5-6F",[.4,.8]],
+ bx_jab:["delt:1-5F,delt:1-3F,tri:1-5B,tri:1-3B,obl:1-2F",[.2,1,.2,1]],bx_croc:["delt:1-5F,delt:1-3F,obl:1-2F,pec:1-2F",[.2,1,1,1,.2,.6]],
+ bx_upp:["bic:1-5F,delt:1-3F,quad:2-9F,obl:1-2F",[.2,1,.2,1,1]],bx_combo:["delt:1-5F,delt:1-3F,tri:1-5B,obl:1-2F",[.2,1,1,1,.6,1]],
+ bx_def:["quad:2-9F,quad:2-7F,obl:1-2F,delt:1-3F",[.2,.8,.2,1,1]],bx_vit:["delt:1-5F,delt:1-3F,tri:1-5B,tri:1-3B",[.2,1,.2,1]],
+ dx_12:["delt:1-5F,delt:1-3F,tri:1-5B,tri:1-3B",[.2,1,.2,1]],dx_123:["delt:1-5F,delt:1-3F,obl:1-2F,tri:1-3B",[.2,1,1,1]],
+ dx_upp:["delt:1-5F,delt:1-3F,bic:1-5F,quad:2-9F",[.2,1,1,1]],dx_libre:["delt:1-5F,delt:1-3F,obl:1-2F,quad:2-9F",[.2,1,1,1,.2,.8]],
+ dx_echange:["",[0,0]],bx_av:["avb:5-6F",[.4,1]],repos:["",[0,0]]};
+const MSH={quad:[.45,.62,.42],ischio:[.48,.62,.4],fess:[.12,.5,.55],tri:[.5,.6,.35],bic:[.5,.6,.35],delt:[.12,.42,.55],lomb:[.72,.45,.32],obl:[.55,.5,.3],
+ psoas:[.88,.35,.3],abdo:[.6,.38,.3],pec:[.24,.34,.38],dos:[.32,.5,.36],mollet:[.32,.55,.45],avb:[.38,.6,.35]};
+const TORSO=new Set(["lomb","obl","psoas","abdo","pec","dos"]);
+const parseM=s=>s?s.split(",").map(x=>{const [k,r]=x.split(":"),side=r.slice(-1),[a,b]=r.slice(0,-1).split("-").map(Number);return [k,a,b,side]}):[];
+const MPARSED={};for(const k in MUSC)MPARSED[k]=parseM(MUSC[k][0]);
+const f1=v=>v.toFixed(1);
+function sg2(p,a,b){const ax=p[a*2],ay=p[a*2+1],bx=p[b*2],by=p[b*2+1],dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1;return {ax,ay,bx,by,dx:dx/L,dy:dy/L,L,nx:dy/L,ny:-dx/L}}
+function limb2(p,a,b,w1,w2,fill){const s=sg2(p,a,b),q=[[s.ax+s.nx*w1/2,s.ay+s.ny*w1/2],[s.bx+s.nx*w2/2,s.by+s.ny*w2/2],[s.bx-s.nx*w2/2,s.by-s.ny*w2/2],[s.ax-s.nx*w1/2,s.ay-s.ny*w1/2]];
+ return `<polygon points="${q.map(v=>f1(v[0])+","+f1(v[1])).join(" ")}" fill="${fill}"/><circle cx="${f1(s.ax)}" cy="${f1(s.ay)}" r="${f1(w1/2)}" fill="${fill}"/><circle cx="${f1(s.bx)}" cy="${f1(s.by)}" r="${f1(w2/2)}" fill="${fill}"/>`}
+const LW={1:[7.4,5.4],3:[5.6,4],2:[12.5,7.6],7:[7.8,5]};
+function segW(a,b){return a===1&&b===2?16:a===2?12.5:a===1?7.2:(b===8||b===10)?7.8:5.6}
+function muscle2(p,m,act){const [k,a,b,side]=m,[t,len,wd]=MSH[k],s=sg2(p,a,b),sg=side==="F"?1:-1,w=segW(a,b),off=TORSO.has(k)?w*.38:w*.24;
+ const cx=s.ax+(s.bx-s.ax)*t+s.nx*off*sg,cy=s.ay+(s.by-s.ay)*t+s.ny*off*sg,ang=Math.atan2(s.dy,s.dx)*180/Math.PI,rx=s.L*len/2,ry=w*wd*.62;
+ return `<g transform="translate(${f1(cx)} ${f1(cy)}) rotate(${f1(ang)})" opacity="${(0.18+0.82*act).toFixed(2)}"><ellipse rx="${f1(rx)}" ry="${f1(ry)}" fill="${GL}" filter="url(#mglow)"/><ellipse rx="${f1(rx*.8)}" ry="${f1(ry*.7)}" fill="#d8ff9e" opacity=".55"/></g>`}
+function propSVG(p,pr){if(!pr)return "";
+ const mx=(p[8]+p[12])/2,my=(p[9]+p[13])/2;
+ if(pr==="ball")return `<circle cx="${f1(mx)}" cy="${f1(my-4)}" r="6" fill="#c0522f" stroke="#7a2e16" stroke-width=".8"/>`;
+ if(pr==="kb")return `<rect x="${f1(mx-4.5)}" y="${f1(my-4)}" width="9" height="10" rx="2.5" fill="#2a2e35" stroke="#666" stroke-width=".6"/>`;
+ if(pr==="kb2")return `<rect x="${f1(p[12]-4)}" y="${f1(p[13])}" width="8" height="8" rx="2" fill="#2a2e35" stroke="#666" stroke-width=".6"/>`;
+ if(pr.startsWith("wall:")){const a=pr.slice(5);return `<rect x="${a-1.5}" y="4" width="3" height="90" fill="#3a4350"/>`}
+ if(pr==="pad")return `<rect x="84" y="15" width="10" height="21" rx="3" fill="#c0392b" stroke="#7a1f16" stroke-width=".8"/>`;
+ if(pr==="mat")return `<rect x="3" y="91.5" width="94" height="3" rx="1.5" fill="#2f5d4a"/>`;
+ if(pr==="tread")return `<rect x="8" y="91" width="84" height="4" rx="2" fill="#2a2e35"/><polyline points="82,92 78,40 70,40" stroke="#4a525c" stroke-width="2.5" fill="none"/>`;
+ if(pr==="tread2")return `<polygon points="8,95 92,82 92,86 8,99" fill="#2a2e35"/><polyline points="82,83 78,36 70,36" stroke="#4a525c" stroke-width="2.5" fill="none"/>`;
+ return ""}
+function anatSVG(p,mus,act,pr){
+ const NEAR="url(#skin)",FAR="#8a5d43",SHORT="#1d2026";
+ const s=sg2(p,1,2),n=[s.nx,s.ny],S=[p[2],p[3]],H=[p[4],p[5]],at=(t,o)=>[S[0]+(H[0]-S[0])*t+n[0]*o,S[1]+(H[1]-S[1])*t+n[1]*o],P=q=>f1(q[0])+","+f1(q[1]);
+ const M=f=>mus.filter(f).map(m=>muscle2(p,m,act)).join("");
+ const behind=pr==="kb2"||pr==="mat"||(pr&&pr.startsWith("tread"))||(pr&&pr.startsWith("wall"));
+ let x=behind?propSVG(p,pr):"";
+ x+=limb2(p,1,3,...LW[1],FAR)+limb2(p,3,4,...LW[3],FAR)+limb2(p,2,7,...LW[2],FAR)+limb2(p,7,8,...LW[7],FAR)+M(m=>[3,4,7,8].includes(m[2]));
+ x+=`<path d="M${P(at(-.06,7.5))} Q${P(at(.3,10.5))} ${P(at(.62,7))} L${P(at(1,7))} L${P(at(1.06,-8.2))} Q${P(at(.55,-7.4))} ${P(at(0,-8.6))} Q${P(at(-.12,0))} ${P(at(-.06,7.5))} Z" fill="${NEAR}"/>`+M(m=>m[1]===1&&m[2]===2);
+ x+=`<circle cx="${f1(H[0])}" cy="${f1(H[1])}" r="9" fill="${SHORT}"/>`+limb2(p,2,9,...LW[2],NEAR)+limb2(p,9,10,...LW[7],NEAR);
+ const t=sg2(p,2,9);x+=`<polygon points="${P([H[0]+t.nx*6.6,H[1]+t.ny*6.6])} ${P([H[0]+t.dx*t.L*.42+t.nx*6.2,H[1]+t.dy*t.L*.42+t.ny*6.2])} ${P([H[0]+t.dx*t.L*.42-t.nx*6.2,H[1]+t.dy*t.L*.42-t.ny*6.2])} ${P([H[0]-t.nx*6.6,H[1]-t.ny*6.6])}" fill="${SHORT}"/>`;
+ x+=M(m=>m[2]===9||m[2]===10);
+ x+=`<path d="M${P(S)} L${f1(p[0])},${f1(p[1]+3)}" stroke="#c99470" stroke-width="5" stroke-linecap="round"/><ellipse cx="${f1(p[0])}" cy="${f1(p[1])}" rx="5.2" ry="6" fill="url(#skin)"/>`;
+ x+=limb2(p,1,5,...LW[1],NEAR)+limb2(p,5,6,...LW[3],NEAR)+M(m=>m[2]===5||m[2]===6);
+ if(!behind)x+=propSVG(p,pr);
+ return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="skin" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#f1c9a5"/><stop offset=".6" stop-color="#d49d77"/><stop offset="1" stop-color="#a8714f"/></radialGradient><filter id="mglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+ <rect x="0" y="86" width="100" height="14" fill="${GL}" opacity=".07"/><line x1="4" y1="93.5" x2="96" y2="93.5" stroke="${GL}" stroke-opacity=".35" stroke-width=".8"/>${x}</svg>`}
+function actAt(id,now){const an=ANIM[id]||[[EX[id]?EX[id][1]:"debout"],4],n=an[0].length,acts=(MUSC[id]||["",[]])[1];
+ const A=i=>acts.length?acts[Math.min(i,acts.length-1)]:(i%2?1:.3);if(n===1||reduceMotion)return A(Math.min(1,n-1));
+ const ph=((now/1000)%an[1])/an[1]*n,i=Math.floor(ph),f=ph-i,e=(1-Math.cos(Math.PI*f))/2;return A(i)+(A((i+1)%n)-A(i))*e}
+function animEx(el,now){const id=el.dataset.ex;if(id)el.innerHTML=anatSVG(frameAt(id,now),MPARSED[id]||[],actAt(id,now),PROPX[id])}
 let lastAnim=0;
 function animLoop(now){
  if(view.v==="sess"&&now-lastAnim>40){lastAnim=now;
@@ -512,7 +581,7 @@ function drawSession(app,s){
  <div class="btns"><button id="go">Démarrer</button><button id="skip">Passer</button><button id="reset">Recommencer</button></div>
  <p class="tot" id="tot"></p>
  <details><summary>Au programme (${S.length} étapes)</summary><ol class="plan">${S.map(x=>`<li>${esc(x.n)} <span>· ${fmt(x.d)}${x.sl?" · "+esc(x.sl):""}</span></li>`).join("")}</ol></details>
- <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" data-ex="${id}" style="width:72px;height:72px;color:var(--work)"></div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
+ <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" data-ex="${id}" style="width:84px;height:84px"></div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
  app.innerHTML=h;
  $("go").onclick=toggle;
  $("skip").onclick=()=>{if(el<0)el=0;else if(el<TOTAL){const k=stepAt(el);el=S[k+1]?starts[k+1]:TOTAL}last=performance.now();if(el>=TOTAL)finish();render()};
