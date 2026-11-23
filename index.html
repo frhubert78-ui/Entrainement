@@ -56,8 +56,8 @@ button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visi
 .now{--cur:var(--soft);border-top:6px solid var(--cur);padding-top:10px}
 .now.work,.now.calm{--cur:var(--work)}.now.rest{--cur:var(--rest)}
 .phase{color:var(--cur);font-size:1.25rem;font-weight:700}
-.tline{display:flex;align-items:center;gap:12px}
-.time{font-size:5.6rem;font-weight:700;line-height:1;margin:2px 0 8px;flex:1}
+.views{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}.views.sm{max-width:260px}.pose2{aspect-ratio:1;border-radius:14px;background:radial-gradient(ellipse at 50% 35%,#45484e,#26282c 80%);border:1px solid #3a3d42;overflow:hidden}.pose2 svg{width:100%;height:100%;display:block}.vw span{display:block;text-align:center;font-size:.8rem;color:var(--soft);margin-top:2px}
+.time{font-size:4.6rem;font-weight:700;line-height:1;margin:2px 0 6px}
 .pose{width:120px;height:120px;flex:none;border-radius:14px;background:radial-gradient(ellipse at 50% 35%,#45484e,#26282c 80%);border:1px solid #3a3d42;overflow:hidden}
 .pose svg{width:100%;height:100%}
 .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
@@ -363,7 +363,64 @@ function skelSVG(p,mus,act,pr){
  return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}<filter id="mglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
  <rect x="0" y="86" width="100" height="14" fill="${GL}" opacity=".06"/><line x1="4" y1="93.5" x2="96" y2="93.5" stroke="${GL}" stroke-opacity=".3" stroke-width=".8"/>${x}</svg>`}
 
-function animEx(el,now){const id=el.dataset.ex;if(id)el.innerHTML=skelSVG(frameAt(id,now),MPARSED[id]||[],actAt(id,now),PROPX[id])}
+/* ===== Deux vues : profil + face (ou dessus pour les exercices au sol) ===== */
+const FRONTP=new Set(["bras_cotes","bras_cotes_h","mains_hanches","hanche_g","hanche_d","tete_penchee","halo","halo_g","halo_d","tc_nuages","tc_nuages_m","tc_ballon","tc_ballon_ouv","tc_ventre","debout_haut","bras_haut","papillon","papillon_p"]);
+const LATD=[0,0,0,-10,-10,10,10,-5.5,-6,5.5,6];
+const T3={};
+function to3(name){if(T3[name])return T3[name];const p=poseArr(name),fr=FRONTP.has(name),o={y:[],z:[],l:[],bd:p[22]||0};
+ for(let i=0;i<11;i++){const x=p[i*2];o.y.push(p[i*2+1]);if(fr){o.l.push(i<3?0:x-50);o.z.push(i===4||i===6?4:0)}else{o.l.push(LATD[i]);o.z.push(x-50)}}
+ return T3[name]=o}
+function frame3(id,now){const an=ANIM[id]||[[EX[id]?EX[id][1]:"debout"],4],fr=an[0],n=fr.length;
+ if(n===1||reduceMotion)return to3(fr[Math.min(1,n-1)]);
+ const ph=((now/1000)%an[1])/an[1]*n,i=Math.floor(ph),f=ph-i,e=(1-Math.cos(Math.PI*f))/2,a=to3(fr[i]),b=to3(fr[(i+1)%n]),L=(u,v)=>u.map((x,k)=>x+(v[k]-x)*e);
+ return {y:L(a.y,b.y),z:L(a.z,b.z),l:L(a.l,b.l),bd:a.bd+(b.bd-a.bd)*e}}
+const sideP=o=>{const p=[];for(let i=0;i<11;i++)p.push(50+o.z[i],o.y[i]);p.push(o.bd);return p};
+const V2={};
+function view2(id){if(V2[id])return V2[id];const fr=(ANIM[id]||[[EX[id][1]]])[0],o=to3(fr[0]);
+ return V2[id]=Math.abs(o.z[1]-o.z[2])>Math.abs(o.y[1]-o.y[2])?"top":"front"}
+function frontSVG(o,mus,act,pr,top){
+ const X=i=>top?50+o.z[i]:50+o.l[i],Y=i=>top?64+o.l[i]*1.1:o.y[i],D=i=>top?-o.y[i]:o.z[i];
+ const ax=top?[0,1.1]:[1,0],S=[X(1),Y(1)],H=[X(2),Y(2)];let v=[H[0]-S[0],H[1]-S[1]];if(Math.hypot(v[0],v[1])<4)v=top?[4,0]:[0,4];
+ const z={};for(const m of mus){const k=ZONE[m[0]],R=[5,6,9,10].includes(m[2])||(m[1]===1&&m[2]===2);z[k+(R?"N":"F")]=1;if(m[1]===1&&m[2]===2)z[k+"F"]=1}
+ const g=k=>z[k]?(0.25+0.75*act).toFixed(2):0,P=q=>f1(q[0])+","+f1(q[1]),add=(a,b,s=1)=>[a[0]+b[0]*s,a[1]+b[1]*s];
+ const SL=add(S,ax,-8.5),SR=add(S,ax,8.5),HL=add(H,ax,-5.5),HR=add(H,ax,5.5);
+ const pt=i=>[X(i),Y(i)],seg=(A,B,w1,w2,fill,gl)=>bone([A[0],A[1],B[0],B[1]],0,1,w1,w2,fill,gl);
+ const pal=d=>d< -3?"url(#f_":"url(#n_";
+ const items=[];
+ const arm=(sh,e,w,side)=>{const d=(D(e)+D(w))/2,pre=pal(d-D(1)),E=pt(e),W=pt(w);
+  items.push({d,s:seg(sh,E,4.6,3.6,pre+"uarm)",g("uarm"+side))+seg(E,W,3.6,2.8,pre+"farm)",g("farm"+side))+ball(E[0],E[1],2.4,pre+"joint)")+ball(W[0],W[1],2.6,pre+"hand)")+ball(sh[0],sh[1],2.9,pre+"joint)",g("shoulder"+side))})};
+ const leg=(hp,k,f,side)=>{const d=(D(k)+D(f))/2-.5,pre=pal(d-D(2)),K=pt(k),F=pt(f);
+  items.push({d:Math.min(d,-.2),leg:1,s:seg(hp,K,6.2,5,pre+"thigh)",g("thigh"+side))+seg(K,F,5,4,pre+"shin)",g("shin"+side))+ball(K[0],K[1],3.6,pre+"knee)")+`<ellipse cx="${f1(F[0])}" cy="${f1(F[1]+(top?0:.5))}" rx="${top?2.4:3}" ry="${top?3.4:2.2}" fill="${pre}foot)"/>`})};
+ arm(SL,3,4,"F");arm(SR,5,6,"N");leg(HL,7,8,"F");leg(HR,9,10,"N");
+ /* tronc */
+ const C1=add(S,v,.62),rib=`M${P(add(SL,ax,-.8))} Q${P(add(add(S,v,.1),ax,-10.5))} ${P(add(C1,ax,-7))} Q${P(add(C1,v,.08))} ${P(add(C1,ax,7))} Q${P(add(add(S,v,.1),ax,10.5))} ${P(add(SR,ax,.8))} Q${P(add(S,v,-.08))} ${P(add(SL,ax,-.8))} Z`;
+ let tor=(g("ribF")?`<path d="${rib}" fill="none" stroke="${GL}" stroke-width="3.4" opacity="${g("ribF")}" filter="url(#mglow)"/>`:"")+`<path d="${rib}" fill="url(#n_rib)"/>`;
+ tor+=`<path d="M${P(S)} L${P(add(S,v,.55))}" stroke="#c98a6f" stroke-width="1.1"/>`;
+ for(const t of [.2,.34,.48])tor+=`<path d="M${P(add(add(S,v,t),ax,-7))} Q${P(add(S,v,t+.07))} ${P(add(add(S,v,t),ax,7))}" stroke="#b9765c" stroke-width=".6" fill="none" opacity=".55"/>`;
+ tor+=bone([C1[0],C1[1],H[0],H[1]],0,1,3,3,"url(#n_spine)",0);
+ const pg=g("pelvisF")||g("pelvisN"),pel=`M${P(add(add(H,ax,-8),v,-.14))} Q${P(add(H,ax,-3))} ${P(add(H,v,.16))} Q${P(add(H,ax,3))} ${P(add(add(H,ax,8),v,-.14))} Q${P(add(H,v,-.05))} ${P(add(add(H,ax,-8),v,-.14))} Z`;
+ tor+=(pg?`<ellipse cx="${f1(H[0])}" cy="${f1(H[1])}" rx="10" ry="7" fill="${GL}" opacity="${pg}" filter="url(#mglow)"/>`:"")+`<path d="${pel}" fill="url(#n_pelvis)"/>`;
+ /* tête */
+ const Hd=pt(0);tor+=bone([S[0],S[1],Hd[0],Hd[1]],0,1,2.6,2.6,"url(#n_neck)",0)+`<circle cx="${f1(Hd[0])}" cy="${f1(Hd[1])}" r="6.2" fill="url(#n_skull)"/>`;
+ if(!top)tor+=`<ellipse cx="${f1(Hd[0])}" cy="${f1(Hd[1]+5)}" rx="3.6" ry="2.4" fill="url(#n_skull)"/><circle cx="${f1(Hd[0]-2.3)}" cy="${f1(Hd[1]+.3)}" r="1.4" fill="#3a5566" opacity=".75"/><circle cx="${f1(Hd[0]+2.3)}" cy="${f1(Hd[1]+.3)}" r="1.4" fill="#3a5566" opacity=".75"/>`;
+ items.sort((a,b)=>a.d-b.d);
+ let x="";if(top&&(pr==="mat"||pr==="tread"))x+=`<rect x="6" y="48" width="88" height="32" rx="4" fill="#2f5d4a" opacity=".85"/>`;
+ if(!top&&pr==="mat")x+=`<rect x="10" y="91.5" width="80" height="3" rx="1.5" fill="#2f5d4a"/>`;
+ if(!top&&(pr==="tread"||pr==="tread2"))x+=`<rect x="22" y="91" width="56" height="4" rx="2" fill="#2a2e35"/><path d="M28,92 L28,46 L72,46 L72,92" stroke="#4a525c" stroke-width="2.5" fill="none"/>`;
+ for(const it of items)if(it.leg)x+=it.s;
+ for(const it of items)if(!it.leg&&it.d< -1)x+=it.s;
+ x+=tor;
+ for(const it of items)if(!it.leg&&it.d>=-1)x+=it.s;
+ const hm=[(X(4)+X(6))/2,(Y(4)+Y(6))/2];
+ if(pr==="ball")x+=`<circle cx="${f1(hm[0])}" cy="${f1(hm[1]-3)}" r="6" fill="#c0522f" stroke="#7a2e16" stroke-width=".8"/>`;
+ if(pr==="kb")x+=`<rect x="${f1(hm[0]-4.5)}" y="${f1(hm[1]-2)}" width="9" height="10" rx="2.5" fill="#2a2e35" stroke="#666" stroke-width=".6"/>`;
+ if(pr==="kb2")for(const i of [4,6])x+=`<rect x="${f1(X(i)-3.5)}" y="${f1(Y(i))}" width="7" height="8" rx="2" fill="#2a2e35" stroke="#666" stroke-width=".6"/>`;
+ let defs="";for(const [k,c] of Object.entries(SK)){defs+=shade("n_"+k,c)+shade("f_"+k,c).replace(/<stop offset="1" stop-color="([^"]+)"/,'<stop offset="1" stop-color="#5a5f6a"')}
+ return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}<filter id="mglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+ ${top?"":`<rect x="0" y="86" width="100" height="14" fill="${GL}" opacity=".06"/><line x1="4" y1="93.5" x2="96" y2="93.5" stroke="${GL}" stroke-opacity=".3" stroke-width=".8"/>`}${x}</svg>`}
+function animEx(el,now){const id=el.dataset.ex;if(!id||!ANIM[id]&&!EX[id])return;const o=frame3(id,now),m=MPARSED[id]||[],a=actAt(id,now);
+ if(el.dataset.v==="v2"){const t=view2(id);el.innerHTML=frontSVG(o,m,a,PROPX[id],t==="top");const lb=el.parentNode.querySelector(".vl");if(lb)lb.textContent=t==="top"?"Dessus":"Face"}
+ else el.innerHTML=skelSVG(sideP(o),m,a,PROPX[id])}
 let lastAnim=0;
 function animLoop(now){
  if(view.v==="sess"&&now-lastAnim>40){lastAnim=now;
@@ -613,13 +670,13 @@ function drawSession(app,s){
  let h=`<button class="back" data-back>← Séances</button><h2>${s.em} ${esc(s.nom)}</h2><p class="sub">${esc(s.sub)}</p>
  <div class="chips">${s.mat.map(m=>`<span class="chip">${esc(m)}</span>`).join("")}<span class="chip">👤 ${esc(u.name)}</span></div>`;
  if(s.levels.length>1)h+=`<div class="lv">${s.levels.map((l,i)=>`<button data-lvl="${i}" aria-pressed="${i===li}">${l[0]}<br><small>${minutes(levelSteps(s,i))} min</small></button>`).join("")}</div>`;
- h+=`<section class="now" id="now" aria-live="polite"><div class="phase" id="phase"></div><div class="tline"><div class="time" id="time"></div><div class="pose" id="pose" style="color:var(--work)"></div></div>
+ h+=`<section class="now" id="now" aria-live="polite"><div class="phase" id="phase"></div><div class="time" id="time"></div><div class="views"><div class="vw"><div class="pose2" id="pose" data-v="side"></div><span>Profil</span></div><div class="vw"><div class="pose2" id="pose2" data-v="v2"></div><span class="vl">Face</span></div></div>
  <div class="bar"><i id="fill"></i></div><div class="br" id="br" hidden><span class="dot" id="dot"></span><span id="bt"></span></div>
  <h2 id="name"></h2><div class="sl" id="sl"></div><p id="cue"></p><p class="mid" id="midc"></p><p class="next" id="next"></p></section>
  <div class="btns"><button id="go">Démarrer</button><button id="skip">Passer</button><button id="reset">Recommencer</button></div>
  <p class="tot" id="tot"></p>
  <details><summary>Au programme (${S.length} étapes)</summary><ol class="plan">${S.map(x=>`<li>${esc(x.n)} <span>· ${fmt(x.d)}${x.sl?" · "+esc(x.sl):""}</span></li>`).join("")}</ol></details>
- <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div style="display:flex;gap:10px;align-items:flex-start"><div class="pose" data-ex="${id}" style="width:84px;height:84px"></div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
+ <h3>Comment faire</h3>${s.rules||""}${uniq.map(id=>`<details><summary>${esc(EX[id][0])}</summary><div class="views sm"><div class="vw"><div class="pose2" data-ex="${id}" data-v="side"></div><span>Profil</span></div><div class="vw"><div class="pose2" data-ex="${id}" data-v="v2"></div><span class="vl">Face</span></div></div><p>${esc(EX[id][3]||EX[id][2])}</p></div></details>`).join("")}`;
  app.innerHTML=h;
  $("go").onclick=toggle;
  $("skip").onclick=()=>{if(el<0)el=0;else if(el<TOTAL){const k=stepAt(el);el=S[k+1]?starts[k+1]:TOTAL}last=performance.now();if(el>=TOTAL)finish();render()};
@@ -645,7 +702,7 @@ function render(){
   $("name").textContent=s.n;$("sl").textContent=(s.t==="work"||s.ex==="dx_echange")?s.sl:"";$("cue").textContent=s.c;
   $("midc").textContent=(s.mid&&el-starts[k]>=s.mid)?s.mc:"";
   $("next").textContent=S[k+1]?"Ensuite : "+S[k+1].n+(S[k+1].t==="work"&&S[k+1].sl?", "+S[k+1].sl.toLowerCase():""):""}
- if(pk!==poseKey){poseKey=pk;$("pose").dataset.ex=pk;animEx($("pose"),performance.now())}
+ if(pk!==poseKey){poseKey=pk;for(const k of ["pose","pose2"]){$(k).dataset.ex=pk;animEx($(k),performance.now())}}
  const br=$("br");
  if(s&&s.breath&&el>=0&&el<TOTAL){const p=((el%8)+8)%8;br.hidden=false;$("bt").textContent=p<4?"Inspire":"Expire";$("dot").style.transform=reduce?"none":"scale("+(.65+.65*(1-Math.cos(2*Math.PI*p/8))/2)+")"}else br.hidden=true;
  $("now").className="now "+cls;$("time").textContent=fmt(rem);$("fill").style.width=(100*(1-rem/dur))+"%";
