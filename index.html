@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<script>try{var nv=(performance.getEntriesByType("navigation")[0]||{}).type;if(localStorage.getItem("univers")==="salle"&&nv!=="back_forward"){location.replace("salle/")}}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mon entraînement</title>
 <meta name="theme-color" content="#2447A8">
@@ -100,6 +101,9 @@ html{background:var(--bg)}body{background:transparent}
 .now{background:color-mix(in srgb,var(--card) 82%,transparent);border-radius:0 0 16px 16px;padding:10px 14px 14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .card,.today,.stat,.wk,.hitem,.row button,.lv button:not([aria-pressed="true"]),.users button:not(.on),.btns button:not(#go){background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 details{background:color-mix(in srgb,var(--card) 70%,transparent);padding:8px 12px;border-radius:10px;margin-bottom:6px;border:0!important}
+.univ{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin:0 0 14px}
+.univ a,.univ span{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:999px;font-weight:700;color:var(--ink);text-decoration:none}
+.univ .on{background:var(--main);color:var(--on)}
 </style>
 </head>
 <body>
@@ -611,7 +615,7 @@ function userChips(){return `<div class="users">${DB.users.map(u=>`<button data-
 function doneToday(u,id){const k=dkey(Date.now());return u.hist.some(h=>h.d===k&&(!id||h.s===id))}
 function drawHome(app){
  const u=U(),today=new Date().getDay(),sid=u.week[today],s=SBY[sid],ws=weekStats(u),sk=streak(u);
- let h=`<h1>Mon entraînement</h1>${userChips()}`;
+ let h=`<div class="univ" role="group" aria-label="Univers"><span class="on" aria-current="page">🏠 Maison</span><a href="salle/" data-univ="salle">🏋️ Salle</a></div><h1>Mon entraînement</h1>${userChips()}`;
  if(s){const li=u.lvl[s.id]??s.def,m=minutes(levelSteps(s,li));
   h+=`<div class="today" style="--c:${s.c}"><div class="lbl">Aujourd'hui · ${JOURS[today]}</div><div class="big">${s.em} ${esc(s.nom)}</div>
   <div class="sub" style="margin:0">${m} min · ${s.mat.join(", ")}</div>${doneToday(u,s.id)?`<p style="margin:8px 0 0;color:${s.c};font-weight:700">✓ Faite aujourd'hui, bravo !</p>`:`<button data-sess="${s.id}">Commencer</button>`}</div>`}
@@ -734,6 +738,8 @@ document.addEventListener("click",e=>{
 });
 try{history.replaceState({v:"home"},"")}catch(e){}
 draw();
+document.addEventListener("click",e=>{const a=e.target.closest("[data-univ]");if(!a)return;e.preventDefault();try{localStorage.setItem("univers","salle")}catch(x){}location.replace(a.getAttribute("href"))},true);
+try{localStorage.setItem("univers",localStorage.getItem("univers")==="salle"?"salle":"maison")}catch(e){}
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
 </body>
