@@ -104,11 +104,41 @@ details{background:color-mix(in srgb,var(--card) 70%,transparent);padding:8px 12
 .univ{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin:0 0 14px}
 .univ a,.univ span{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:999px;font-weight:700;color:var(--ink);text-decoration:none}
 .univ .on{background:var(--main);color:var(--on)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs button{border:0;border-radius:0;background:none;min-height:58px;padding:8px 2px;font-size:12px;font-weight:600;color:var(--soft);display:grid;justify-items:center;gap:2px}
+nav.tabs button svg{width:24px;height:24px}nav.tabs button.on{color:var(--main)}
+body.insess nav.tabs{display:none}body:not(.insess) main{padding-bottom:96px}
+.toast{bottom:84px}
+.chipsm{display:flex;gap:8px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px}.chipsm button{flex:none;min-height:40px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);font-weight:600}.chipsm button.on{background:var(--main);border-color:var(--main);color:var(--on)}
+.kpi{margin:4px 0 10px}.kpi b{font-family:"Barlow Condensed",sans-serif;font-size:2.8rem;line-height:1}.kpi small{color:var(--soft);font-size:1rem}.kpi span{display:block;color:var(--soft);font-size:.92rem}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 14px;overflow:hidden}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mgrid label{display:grid;gap:4px;font-size:.85rem;color:var(--soft)}
+.mgrid input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px;width:100%}
+.save2{margin-top:12px;background:var(--main);border-color:var(--main);color:var(--on);font-weight:700;width:100%}
+.mhist{list-style:none;padding:0;margin:0}.mhist li{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0;font-size:.92rem}.mhist b{flex:none;width:46px}.mhist span{flex:1}.mhist button{min-height:36px;padding:2px 10px;border-color:var(--line)}
+.mat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px}.mat b{font-size:1.05rem}.mat small{color:var(--soft);margin-left:6px}
+.mat .ss{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.mat .ss button{min-height:36px;padding:4px 10px;border-radius:999px;border:1.5px solid var(--c,var(--line));font-size:.88rem}
 </style>
 </head>
 <body>
 <div class="bgimg"></div><div class="bgveil"></div>
 <main id="app"></main>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="n-db" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 32h28"/><rect x="8" y="22" width="7" height="20" rx="2"/><rect x="15" y="25" width="4" height="14" rx="1"/><rect x="49" y="22" width="7" height="20" rx="2"/><rect x="45" y="25" width="4" height="14" rx="1"/></g></symbol>
+<symbol id="n-chart" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 56h48M12 46l12-14 10 8 18-22"/><circle cx="52" cy="18" r="3"/></g></symbol>
+<symbol id="n-tape" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="26" cy="30" r="17"/><circle cx="26" cy="30" r="5"/><path d="M26 47h30v-9"/></g></symbol>
+<symbol id="n-kb" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 22a10 10 0 0 1 20 0"/><path d="M16 30q16-10 32 0l-3 24H19z"/></g></symbol>
+<symbol id="n-plate" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="8"/></g></symbol>
+</defs></svg>
+<nav class="tabs" id="tabs">
+ <button data-tab="home"><svg viewBox="0 0 64 64"><use href="#n-db"/></svg>Séances</button>
+ <button data-tab="hist"><svg viewBox="0 0 64 64"><use href="#n-chart"/></svg>Progrès</button>
+ <button data-tab="meas"><svg viewBox="0 0 64 64"><use href="#n-tape"/></svg>Mesures</button>
+ <button data-tab="mat"><svg viewBox="0 0 64 64"><use href="#n-kb"/></svg>Matériel</button>
+ <button data-tab="set"><svg viewBox="0 0 64 64"><use href="#n-plate"/></svg>Réglages</button>
+</nav>
+
 <div class="toast" id="toast"></div>
 <script>
 "use strict";
@@ -604,8 +634,14 @@ function setColor(c){document.documentElement.style.setProperty("--work",c||"var
 
 function draw(){
  const app=$("app");
+ const tab={home:"home",week:"home",hist:"hist",meas:"meas",mat:"mat",set:"set",users:"set"}[view.v]||"home";
+ document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+ document.body.classList.toggle("insess",view.v==="sess");
  if(view.v==="sess"&&SBY[view.id]) return drawSession(app,SBY[view.id]);
  setColor(null);
+ if(view.v==="meas") return drawMeas(app);
+ if(view.v==="mat") return drawMat(app);
+ if(view.v==="set") return drawSet(app);
  if(view.v==="week") return drawWeek(app);
  if(view.v==="hist") return drawHist(app);
  if(view.v==="users") return drawUsers(app);
@@ -625,10 +661,7 @@ function drawHome(app){
  <h3>Toutes les séances</h3>`;
  for(const s of SESSIONS){const ms=s.levels.map((l,i)=>minutes(levelSteps(s,i))),r=ms.length>1?ms[0]+"–"+ms[ms.length-1]:ms[0];
   h+=`<button class="card" data-sess="${s.id}" style="--c:${s.c}"><span class="em">${s.em}</span><div><b>${esc(s.nom)}</b><span>${r} min · ${s.mat.join(", ")}</span></div>${doneToday(u,s.id)?`<span class="done">✓ aujourd'hui</span>`:""}</button>`}
- h+=`<div class="row" style="margin-top:14px"><button id="snd">${DB.sound?"🔔 Bips : oui":"🔕 Bips : non"}</button><button id="vox">${DB.voice?"🗣️ Voix : oui":"🤐 Voix : non"}</button></div>`;
  app.innerHTML=h;
- $("snd").onclick=()=>{DB.sound=!DB.sound;save();draw()};
- $("vox").onclick=()=>{DB.voice=!DB.voice;save();draw();if(DB.voice)say("La voix est activée.")};
 }
 function drawWeek(app){
  const u=U();let h=`<button class="back" data-back>← Retour</button><h2>📅 Ma semaine</h2><p class="sub">Semaine type de <b>${esc(u.name)}</b>. La séance du jour s'affiche sur l'accueil.</p>`;
@@ -727,6 +760,66 @@ function tick(){
 }
 setInterval(tick,100);
 
+
+/* ============ MESURES (partagées avec la Salle) / MATÉRIEL / RÉGLAGES ============ */
+const MK="carnet-muscu-v1",MET=[["poids","Poids","kg"],["taille","Tour de taille","cm"],["hanches","Tour de hanches","cm"],["poitrine","Tour de poitrine","cm"],["bras","Tour de bras","cm"],["cuisse","Tour de cuisse","cm"],["mollet","Tour de mollet","cm"]];
+let mMet="poids";
+const mf1=x=>String(Math.round(x*10)/10).replace(".",","),msg1=x=>(x>0?"+":x<0?"−":"±")+mf1(Math.abs(x));
+function MSload(){try{return JSON.parse(localStorage.getItem(MK)||"null")}catch(e){return null}}
+function MSsave(s){try{localStorage.setItem(MK,JSON.stringify(s))}catch(e){}}
+function mChart(pts,W){const H=200;if(pts.length<2)return `<svg width="${W}" height="${H}"><text x="${W/2}" y="${H/2}" text-anchor="middle" style="fill:var(--soft);font-size:14px">${pts.length?"Encore une mesure pour voir la courbe":"Pas encore de données"}</text></svg>`;
+ const L=44,R=14,T=16,B=28,vs=pts.map(p=>p.v);let lo=Math.min(...vs),hi=Math.max(...vs);if(hi-lo<2){lo-=1;hi+=1}
+ const X=i=>L+i*(W-L-R)/(pts.length-1),Y=v=>T+(hi-v)*(H-T-B)/(hi-lo);let s="";
+ [lo,(lo+hi)/2,hi].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" style="fill:var(--soft);font-size:12px">${mf1(v)}</text>`});
+ s+=`<polyline fill="none" points="${pts.map((p,i)=>X(i)+","+Y(p.v)).join(" ")}" style="stroke:var(--main);stroke-width:3;stroke-linejoin:round"/>`+pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p.v)}" r="5" style="fill:var(--card);stroke:var(--main);stroke-width:3"/>`).join("");
+ const d=p=>p.d.slice(8,10)+"/"+p.d.slice(5,7);s+=`<text x="${X(0)}" y="${H-8}" style="fill:var(--soft);font-size:12px">${d(pts[0])}</text><text x="${X(pts.length-1)}" y="${H-8}" text-anchor="end" style="fill:var(--soft);font-size:12px">${d(pts[pts.length-1])}</text>`;
+ return `<svg width="${W}" height="${H}" role="img" aria-label="Courbe">${s}</svg>`}
+function drawMeas(app){
+ const ms=MSload();let h=`<h2>📏 Mesures</h2>`;
+ if(!ms||!Array.isArray(ms.profiles)||!ms.profiles.length){app.innerHTML=h+`<div class="empty">Ouvre une première fois l'univers <b>Salle</b> pour activer les mesures, qui sont communes aux deux univers.</div>`;return}
+ ms.meas=Array.isArray(ms.meas)?ms.meas:[];
+ const ui=Math.max(0,DB.users.findIndex(u=>u.id===DB.cur)),pr=ms.profiles[Math.min(ui,ms.profiles.length-1)];
+ const list=ms.meas.filter(m=>m.p===pr.id).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0),mt=MET.find(m=>m[0]===mMet)||MET[0];
+ const pts=list.filter(m=>m.v[mt[0]]!=null).map(m=>({d:m.d,v:m.v[mt[0]]})),z=pts[pts.length-1],y=pts[pts.length-2],a=pts[0];
+ const dd=s=>s.slice(8,10)+"/"+s.slice(5,7),tk=new Date(),tday=tk.getFullYear()+"-"+String(tk.getMonth()+1).padStart(2,"0")+"-"+String(tk.getDate()).padStart(2,"0");
+ const lastOf=k=>{const l=list.slice().reverse().find(x=>x.v[k]!=null);return l?mf1(l.v[k]):""};
+ h+=`${userChips()}<p class="sub">Mesures de <b>${esc(pr.name)}</b> · les mêmes que dans l'univers Salle.</p>
+ <div class="chipsm">${MET.map(m=>`<button data-met="${m[0]}" class="${m[0]===mt[0]?"on":""}">${m[1]}</button>`).join("")}</div>
+ ${z?`<div class="kpi"><b>${mf1(z.v)}</b> <small>${mt[2]}</small><span>${y?`${msg1(z.v-y.v)} ${mt[2]} depuis le ${dd(y.d)}`:`Mesuré le ${dd(z.d)}`}${a&&pts.length>2?` · ${msg1(z.v-a.v)} ${mt[2]} depuis le ${dd(a.d)}`:""}</span></div>`:`<div class="empty">Pas encore de mesure : ${mt[1].toLowerCase()}.</div>`}
+ <div class="chart" id="mch"></div>
+ <form class="box" id="mform"><h3 style="margin-top:0">Nouvelle mesure</h3><p class="sub" style="font-size:.9rem">Remplis seulement ce que tu as mesuré. En gris : ta dernière valeur.</p>
+ <div class="mgrid"><label>Date<input type="date" name="d" value="${tday}" max="${tday}"></label>${MET.map(m=>`<label>${m[1]} (${m[2]})<input name="${m[0]}" inputmode="decimal" placeholder="${lastOf(m[0])}"></label>`).join("")}</div>
+ <button class="save2">Enregistrer</button></form>
+ <div class="box"><h3 style="margin-top:0">Historique</h3>${list.length?`<ul class="mhist">${list.slice().reverse().map(m=>`<li><b>${dd(m.d)}</b><span>${MET.filter(t=>m.v[t[0]]!=null).map(t=>`${t[1].replace("Tour de ","")} ${mf1(m.v[t[0]])} ${t[2]}`).join(" · ")}</span><button data-mdel="${m.d}" aria-label="Supprimer">✕</button></li>`).join("")}</ul>`:`<p class="sub" style="margin:0">Aucune mesure enregistrée.</p>`}</div>`;
+ app.innerHTML=h;
+ const c=$("mch");c.innerHTML=mChart(pts,Math.max(260,c.clientWidth||320));
+ app.querySelectorAll("[data-met]").forEach(b=>b.onclick=()=>{mMet=b.dataset.met;draw()});
+ app.querySelectorAll("[data-mdel]").forEach(b=>b.onclick=()=>{const s=MSload();s.meas=(s.meas||[]).filter(m=>!(m.p===pr.id&&m.d===b.dataset.mdel));MSsave(s);draw();toast("Mesure supprimée")});
+ $("mform").onsubmit=e=>{e.preventDefault();const f=e.target,d=/^\d{4}-\d{2}-\d{2}$/.test(f.d.value)?f.d.value:tday,v={};
+  MET.forEach(m=>{const x=parseFloat(String(f.elements[m[0]].value||"").replace(",","."));if(x>0&&x<1000)v[m[0]]=x});
+  if(!Object.keys(v).length){toast("Entre au moins une valeur");return}
+  const s=MSload();s.meas=Array.isArray(s.meas)?s.meas:[];let en=s.meas.find(m=>m.p===pr.id&&m.d===d);if(!en){en={p:pr.id,d,v:{}};s.meas.push(en)}Object.assign(en.v,v);MSsave(s);
+  if(v[mMet]==null)mMet=Object.keys(v)[0];draw();toast("Mesure enregistrée")};
+}
+function drawMat(app){
+ const map={},none=[];SESSIONS.forEach(s=>{const real=s.mat.filter(m=>!/aucun|personne/i.test(m));if(!real.length)none.push(s);real.forEach(m=>{(map[m]=map[m]||[]).push(s)})});
+ const items=Object.entries(map).sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0]));
+ const btn=s=>`<button data-sess="${s.id}" style="--c:${s.c}">${s.em} ${esc(s.nom)}</button>`;
+ let h=`<h2>🧰 Matériel</h2><p class="sub">Le matériel de la maison et les séances qui l'utilisent. Touche une séance pour la lancer.</p>`;
+ h+=items.map(([m,ss])=>`<div class="mat"><b>${esc(m)}</b><small>${ss.length} séance${ss.length>1?"s":""}</small><div class="ss">${ss.map(btn).join("")}</div></div>`).join("");
+ if(none.length)h+=`<div class="mat"><b>Sans matériel</b><small>${none.length} séance${none.length>1?"s":""}</small><div class="ss">${none.map(btn).join("")}</div></div>`;
+ app.innerHTML=h;
+}
+function drawSet(app){
+ let h=`<h2>⚙️ Réglages</h2>
+ <div class="box"><h3 style="margin-top:0">Sons pendant les séances</h3><div class="row"><button id="snd">${DB.sound?"🔔 Bips : oui":"🔕 Bips : non"}</button><button id="vox">${DB.voice?"🗣️ Voix : oui":"🤐 Voix : non"}</button></div></div>
+ <div class="box"><h3 style="margin-top:0">Profils</h3><p class="sub">${DB.users.map(u=>esc(u.name)).join(" · ")}</p><div class="row"><button data-nav="users">✏️ Renommer les profils</button><button data-nav="week">📅 Ma semaine type</button></div></div>
+ <div class="box"><h3 style="margin-top:0">Univers</h3><p class="sub" style="margin:0">Les mesures sont communes à la Maison et à la Salle : le profil 1 correspond au premier profil de la Salle, le profil 2 au second.</p></div>`;
+ app.innerHTML=h;
+ $("snd").onclick=()=>{DB.sound=!DB.sound;save();draw()};
+ $("vox").onclick=()=>{DB.voice=!DB.voice;save();draw();if(DB.voice)say("La voix est activée.")};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("#tabs [data-tab]");if(!b)return;const v=b.dataset.tab;if(view.v===v)return;go({v},view.v!=="home")});
 /* ============ ÉVÉNEMENTS ============ */
 document.addEventListener("click",e=>{
  const t=e.target.closest("[data-sess],[data-nav],[data-user],[data-back],[data-delh]");if(!t)return;
