@@ -119,10 +119,24 @@ body.insess nav.tabs{display:none}body:not(.insess) main{padding-bottom:96px}
 .mhist{list-style:none;padding:0;margin:0}.mhist li{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0;font-size:.92rem}.mhist b{flex:none;width:46px}.mhist span{flex:1}.mhist button{min-height:36px;padding:2px 10px;border-color:var(--line)}
 .mat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px}.mat b{font-size:1.05rem}.mat small{color:var(--soft);margin-left:6px}
 .mat .ss{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.mat .ss button{min-height:36px;padding:4px 10px;border-radius:999px;border:1.5px solid var(--c,var(--line));font-size:.88rem}
+.top{position:sticky;top:0;z-index:5;background:var(--hd);color:var(--hdink);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;row-gap:8px;padding:10px max(4vw,14px)}
+:root{--hd:#8CCFE0;--hdink:#0B3C49}:root.u1{--hd:#EDC1DC;--hdink:#6B2D5C}
+@media (prefers-color-scheme:dark){:root{--hd:#0B3C49;--hdink:#E3F4F8}:root.u1{--hd:#6B2D5C;--hdink:#FAEAF3}}
+.top .brand{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:21px;display:flex;align-items:center;gap:8px;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .brand svg{width:28px;height:28px;flex:none}
+.top .profs{display:flex;gap:6px;background:color-mix(in srgb,var(--hdink) 14%,transparent);padding:4px;border-radius:999px;flex:none}
+.top .profs button{border:0;background:none;border-radius:999px;padding:8px 12px;min-height:40px;font-weight:600;font-size:14px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--hdink)}
+.top .profs button.on{background:var(--hdink);color:var(--hd)}
+.top .univ{order:3;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4px;background:color-mix(in srgb,var(--hdink) 12%,transparent);border:0;border-radius:999px;padding:4px;margin:0}
+.top .univ a,.top .univ span{display:flex;align-items:center;justify-content:center;min-height:38px;border-radius:999px;font-weight:700;font-size:15px;color:var(--hdink);text-decoration:none}
+.top .univ .on{background:var(--hdink);color:var(--hd)}
+body.insess .top{display:none}
+.top,.top *{transition:background-color .3s,color .3s}
 </style>
 </head>
 <body>
 <div class="bgimg"></div><div class="bgveil"></div>
+<header class="top" id="top"></header>
 <main id="app"></main>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="n-db" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 32h28"/><rect x="8" y="22" width="7" height="20" rx="2"/><rect x="15" y="25" width="4" height="14" rx="1"/><rect x="49" y="22" width="7" height="20" rx="2"/><rect x="45" y="25" width="4" height="14" rx="1"/></g></symbol>
@@ -632,8 +646,14 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600)}
 function setColor(c){document.documentElement.style.setProperty("--work",c||"var(--main)");document.querySelector('meta[name="theme-color"]').setAttribute("content",c||"#2447A8")}
 
+function drawTop(){
+ const i=Math.max(0,DB.users.findIndex(u=>u.id===DB.cur));document.documentElement.classList.toggle("u1",i%2===1);
+ $("top").innerHTML=`<div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#n-plate"/></svg>Entraînement</div>
+ <div class="profs">${DB.users.map(u=>`<button data-user="${u.id}" class="${u.id===DB.cur?"on":""}">${esc(u.name)}</button>`).join("")}</div>
+ <div class="univ" role="group" aria-label="Univers"><span class="on" aria-current="page">🏠 Maison</span><a href="salle/" data-univ="salle">🏋️ Salle</a></div>`;
+}
 function draw(){
- const app=$("app");
+ const app=$("app");drawTop();
  const tab={home:"home",week:"home",hist:"hist",meas:"meas",mat:"mat",set:"set",users:"set"}[view.v]||"home";
  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
  document.body.classList.toggle("insess",view.v==="sess");
@@ -651,7 +671,7 @@ function userChips(){return `<div class="users">${DB.users.map(u=>`<button data-
 function doneToday(u,id){const k=dkey(Date.now());return u.hist.some(h=>h.d===k&&(!id||h.s===id))}
 function drawHome(app){
  const u=U(),today=new Date().getDay(),sid=u.week[today],s=SBY[sid],ws=weekStats(u),sk=streak(u);
- let h=`<div class="univ" role="group" aria-label="Univers"><span class="on" aria-current="page">🏠 Maison</span><a href="salle/" data-univ="salle">🏋️ Salle</a></div><h1>Mon entraînement</h1>${userChips()}`;
+ let h=``;
  if(s){const li=u.lvl[s.id]??s.def,m=minutes(levelSteps(s,li));
   h+=`<div class="today" style="--c:${s.c}"><div class="lbl">Aujourd'hui · ${JOURS[today]}</div><div class="big">${s.em} ${esc(s.nom)}</div>
   <div class="sub" style="margin:0">${m} min · ${s.mat.join(", ")}</div>${doneToday(u,s.id)?`<p style="margin:8px 0 0;color:${s.c};font-weight:700">✓ Faite aujourd'hui, bravo !</p>`:`<button data-sess="${s.id}">Commencer</button>`}</div>`}
@@ -783,7 +803,7 @@ function drawMeas(app){
  const pts=list.filter(m=>m.v[mt[0]]!=null).map(m=>({d:m.d,v:m.v[mt[0]]})),z=pts[pts.length-1],y=pts[pts.length-2],a=pts[0];
  const dd=s=>s.slice(8,10)+"/"+s.slice(5,7),tk=new Date(),tday=tk.getFullYear()+"-"+String(tk.getMonth()+1).padStart(2,"0")+"-"+String(tk.getDate()).padStart(2,"0");
  const lastOf=k=>{const l=list.slice().reverse().find(x=>x.v[k]!=null);return l?mf1(l.v[k]):""};
- h+=`${userChips()}<p class="sub">Mesures de <b>${esc(pr.name)}</b> · les mêmes que dans l'univers Salle.</p>
+ h+=`<p class="sub">Mesures de <b>${esc(pr.name)}</b> · les mêmes que dans l'univers Salle.</p>
  <div class="chipsm">${MET.map(m=>`<button data-met="${m[0]}" class="${m[0]===mt[0]?"on":""}">${m[1]}</button>`).join("")}</div>
  ${z?`<div class="kpi"><b>${mf1(z.v)}</b> <small>${mt[2]}</small><span>${y?`${msg1(z.v-y.v)} ${mt[2]} depuis le ${dd(y.d)}`:`Mesuré le ${dd(z.d)}`}${a&&pts.length>2?` · ${msg1(z.v-a.v)} ${mt[2]} depuis le ${dd(a.d)}`:""}</span></div>`:`<div class="empty">Pas encore de mesure : ${mt[1].toLowerCase()}.</div>`}
  <div class="chart" id="mch"></div>
