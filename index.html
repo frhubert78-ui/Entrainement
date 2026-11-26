@@ -5,7 +5,7 @@
 <script>try{var nv=(performance.getEntriesByType("navigation")[0]||{}).type;if(localStorage.getItem("univers")==="salle"&&nv!=="back_forward"){location.replace("salle/")}}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mon entraînement</title>
-<meta name="theme-color" content="#2447A8">
+<meta name="theme-color" content="#8CCFE0">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -132,6 +132,21 @@ body.insess nav.tabs{display:none}body:not(.insess) main{padding-bottom:96px}
 .top .univ .on{background:var(--hdink);color:var(--hd)}
 body.insess .top{display:none}
 .top,.top *{transition:background-color .3s,color .3s}
+
+/* palette par profil, alignée sur la partie Salle (Eau claire / Poudré) */
+:root{--bg:#E3F4F8;--card:#fff;--ink:#0B3C49;--soft:#3f6874;--rest:#6b8f99;--line:#c2e2eb;--main:#1F6F8B;--on:#fff}
+:root.u1{--bg:#FAEAF3;--card:#fff;--ink:#4A1A3E;--soft:#7d4c6e;--rest:#a07892;--line:#edc9de;--main:#A84D8A;--on:#fff}
+@media (prefers-color-scheme:dark){
+:root{--bg:#06222a;--card:#0d3039;--ink:#E3F4F8;--soft:#9cc5d1;--rest:#6f9aa6;--line:#1d4652;--main:#8CCFE0;--on:#0B3C49}
+:root.u1{--bg:#230f1e;--card:#33182c;--ink:#FAEAF3;--soft:#d6a9c6;--rest:#a57a96;--line:#4f2846;--main:#D987B8;--on:#4A1A3E}}
+.bgveil{background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 80%,transparent),color-mix(in srgb,var(--bg) 68%,transparent))}
+@media (prefers-color-scheme:dark){.bgveil{background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 76%,transparent),color-mix(in srgb,var(--bg) 60%,transparent))}}
+.chip{background:color-mix(in srgb,var(--main) 14%,var(--card));color:var(--ink)}
+.bar{background:color-mix(in srgb,var(--main) 18%,var(--card))}
+nav.tabs{background:color-mix(in srgb,var(--card) 94%,var(--bg))}
+h1,main>.sub{text-shadow:0 1px 8px color-mix(in srgb,var(--bg) 85%,transparent)}
+body,.card,.today,.stat,.wk,.hitem,.box,.chart,.mat,nav.tabs{transition:background-color .3s,color .3s,border-color .3s}
+@media (prefers-reduced-motion:reduce){body,.card,.today,.stat,.wk,.hitem,.box,.chart,.mat,nav.tabs{transition:none}}
 </style>
 </head>
 <body>
@@ -644,7 +659,7 @@ window.addEventListener("popstate",e=>{stopTimer();view=e.state||{v:"home"};draw
 const $=x=>document.getElementById(x);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600)}
-function setColor(c){document.documentElement.style.setProperty("--work",c||"var(--main)");document.querySelector('meta[name="theme-color"]').setAttribute("content",c||"#2447A8")}
+function setColor(c){document.documentElement.style.setProperty("--work",c||"var(--main)");document.querySelector('meta[name="theme-color"]').setAttribute("content",c||getComputedStyle(document.documentElement).getPropertyValue("--hd").trim()||"#8CCFE0")}
 
 function drawTop(){
  const i=Math.max(0,DB.users.findIndex(u=>u.id===DB.cur));document.documentElement.classList.toggle("u1",i%2===1);
